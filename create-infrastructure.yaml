@@ -1,0 +1,63 @@
+---
+- hosts: localhost
+  tasks:
+    - name: "Transaction Signing Queue"
+      sqs_queue:
+        name: transaction_signing_queue
+        state: present
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+      register: transaction_signing_queue_info
+      notify: transaction_signing_queue_changed
+    - name: "Docsigner User"
+      iam:
+        iam_type: user
+        name: docsigner
+        access_key_state: create
+        state: present
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+      register: docsigner_user_info
+      notify: docsigner_user_changed
+    - set_fact:
+        queue_arn: "{{ transaction_signing_queue_info.queue_arn }}"
+        queue_name: "{{ transaction_signing_queue_info.name }}"
+    - name: "Transaction Signing Queue Receiver Policy"
+      iam_policy:
+        iam_type: user
+        iam_name: docsigner
+        policy_name: transaction_signing_queue_receiver
+        policy_json: "{{ lookup('template', 'templates/iam_policy/sqs_queue_receive.json.j2') }}"
+        state: present
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+      register: transaction_signing_queue_receiver_policy_info
+      with_items:
+        - "{{ transaction_signing_queue_info }}"
+  handlers:
+    - name: "inventory/transaction_signing_queue"
+      template:
+        src: templates/inventory/sqs_queue.j2
+        dest: inventory/transaction_signing_queue
+      listen: transaction_signing_queue_changed
+      with_items:
+        - "{{ transaction_signing_queue_info }}"
+    - name: "inventory/docsigner_user"
+      template:
+        src: templates/inventory/iam_user.j2
+        dest: inventory/docsigner_user
+      listen: docsigner_user_changed
+      with_items:
+        - user_name: "{{ docsigner_user_info.user_meta.access_keys[0].user_name }}"
+          access_key_id: "{{ docsigner_user_info.user_meta.access_keys[0].access_key_id }}"
+          secret_access_key: "{{ docsigner_user_info.user_meta.access_keys[0].secret_access_key }}"
+
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: "Reload Inventory"
+      meta: refresh_inventory

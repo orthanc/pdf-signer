@@ -1,0 +1,37 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: "Transaction Signing Queue Receiver Policy"
+      iam_policy:
+        iam_type: user
+        iam_name: docsigner
+        policy_name: transaction_signing_queue_receiver
+        state: absent
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+    - name: "Docsigner User"
+      iam:
+        iam_type: user
+        name: docsigner
+        state: absent
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+    - name: "Transaction Signing Queue"
+      sqs_queue:
+        name: transaction_signing_queue
+        state: absent
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+    - name: "inventory/transaction_signing_queue"
+      file:
+        path: inventory/transaction_signing_queue
+        state: absent
+    - name: "inventory/docsigner_user"
+      file:
+        path: inventory/docsigner_user
+        state: absent
