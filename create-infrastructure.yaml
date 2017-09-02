@@ -52,8 +52,10 @@
       listen: docsigner_user_changed
       with_items:
         - user_name: "{{ docsigner_user_info.user_meta.access_keys[0].user_name }}"
-          access_key_id: "{{ docsigner_user_info.user_meta.access_keys[0].access_key_id }}"
-          secret_access_key: "{{ docsigner_user_info.user_meta.access_keys[0].secret_access_key }}"
+          aws_access_key: "{{ docsigner_user_info.user_meta.access_keys[0].access_key_id }}"
+          aws_secret_key: "{{ docsigner_user_info.user_meta.access_keys[0].secret_access_key }}"
+      loop_control:
+        label: "{{ item.user_name }}"
 
 - hosts: localhost
   connection: local
