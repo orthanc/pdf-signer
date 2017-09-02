@@ -38,17 +38,17 @@
       with_items:
         - "{{ transaction_signing_queue_info }}"
   handlers:
-    - name: "inventory/transaction_signing_queue"
+    - name: "inventory/{{ env_id }}/transaction_signing_queue"
       template:
         src: templates/inventory/sqs_queue.j2
-        dest: inventory/transaction_signing_queue
+        dest: "inventory/{{ env_id }}/transaction_signing_queue"
       listen: transaction_signing_queue_changed
       with_items:
         - "{{ transaction_signing_queue_info }}"
     - name: "inventory/docsigner_user"
       template:
         src: templates/inventory/iam_user.j2
-        dest: inventory/docsigner_user
+        dest: "inventory/{{ env_id }}/docsigner_user"
       listen: docsigner_user_changed
       with_items:
         - user_name: "{{ docsigner_user_info.user_meta.access_keys[0].user_name }}"
