@@ -29,9 +29,9 @@
         aws_secret_key: "{{ aws_secret_key }}"
     - name: "inventory/transaction_signing_queue"
       file:
-        path: "inventory/{{ env_id }}/transaction_signing_queue"
+        path: "inventory/{{ env_id }}/aws-transaction_signing_queue"
         state: absent
     - name: "inventory/docsigner_user"
       file:
-        path: "inventory/{{ env_id }}/docsigner_user"
+        path: "inventory/{{ env_id }}/aws-docsigner_user"
         state: absent
