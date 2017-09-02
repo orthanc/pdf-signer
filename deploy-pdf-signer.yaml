@@ -3,8 +3,8 @@
   tasks:
     - name: "Ensure Docsigner User Exists"
       assert:
-        that: "'user_docsigner' in hostvars"
-        msg: "docsigner user not found, have you created the AWS infrastructure?"
+        that: "'docsigner_user' in hostvars"
+        msg: "docsigner_user not found, have you created the AWS infrastructure?"
     - name: "AWS Directory"
       file:
         path: "{{ ansible_user_dir }}/.aws"
@@ -15,8 +15,8 @@
         dest: "{{ ansible_user_dir }}/.aws/credentials"
         mode: 0600
       with_items:
-        - aws_access_key: "{{ hostvars['user_docsigner']['aws_access_key'] }}"
-          aws_secret_key: "{{ hostvars['user_docsigner']['aws_secret_key'] }}"
+        - aws_access_key: "{{ hostvars['docsigner_user']['aws_access_key'] }}"
+          aws_secret_key: "{{ hostvars['docsigner_user']['aws_secret_key'] }}"
       loop_control:
         label: "Credentials"
 

@@ -3,7 +3,7 @@
   tasks:
     - name: "Transaction Signing Queue"
       sqs_queue:
-        name: transaction_signing_queue
+        name: "{{ env_prefix }}-transaction_signing_queue"
         state: present
         region: "{{ aws_region }}"
         aws_access_key: "{{ aws_access_key }}"
@@ -13,7 +13,7 @@
     - name: "Docsigner User"
       iam:
         iam_type: user
-        name: docsigner
+        name: "{{ env_prefix }}-docsigner"
         access_key_state: create
         state: present
         region: "{{ aws_region }}"
@@ -27,7 +27,7 @@
     - name: "Transaction Signing Queue Receiver Policy"
       iam_policy:
         iam_type: user
-        iam_name: docsigner
+        iam_name: "{{ env_prefix }}-docsigner"
         policy_name: transaction_signing_queue_receiver
         policy_json: "{{ lookup('template', 'templates/iam_policy/sqs_queue_receive.json.j2') }}"
         state: present
@@ -44,7 +44,8 @@
         dest: "{{ inventory_dir }}/aws-transaction_signing_queue"
       listen: transaction_signing_queue_changed
       with_items:
-        - "{{ transaction_signing_queue_info }}"
+        - name: transaction_signing_queue
+          registration: "{{ transaction_signing_queue_info }}"
     - name: "inventory/docsigner_user"
       template:
         src: templates/inventory/iam_user.j2
@@ -52,11 +53,10 @@
         mode: 0600
       listen: docsigner_user_changed
       with_items:
-        - user_name: "{{ docsigner_user_info.user_meta.access_keys[0].user_name }}"
-          aws_access_key: "{{ docsigner_user_info.user_meta.access_keys[0].access_key_id }}"
-          aws_secret_key: "{{ docsigner_user_info.user_meta.access_keys[0].secret_access_key }}"
+        - name: docsigner_user
+          registration: "{{ docsigner_user_info }}"
       loop_control:
-        label: "{{ item.user_name }}"
+        label: "{{ item.name }}"
 
 - hosts: localhost
   connection: local

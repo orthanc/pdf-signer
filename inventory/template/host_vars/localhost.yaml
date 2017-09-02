@@ -1,4 +1,8 @@
 ---
+# The prefix to add to all aws resources created for this environment
+# typical values are dev / test / prod or similar
+env_prefix: PREFIX
+
 # The AWS authentication details used when deploying and destroying infrastructure.
 # It's strongly recommended this file (or at least these keys) be protected with
 # ansible-vault to prevent loss of these keys

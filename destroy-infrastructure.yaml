@@ -1,12 +1,13 @@
 ---
 - hosts: localhost
-  connection: local
-  gather_facts: false
   tasks:
+    - set_fact:
+        docsigner_user_name: "{{ hostvars['docsigner_user']['name'] }}"
+        transaction_signing_queue_name: "{{ hostvars['transaction_signing_queue']['name'] }}"
     - name: "Transaction Signing Queue Receiver Policy"
       iam_policy:
         iam_type: user
-        iam_name: docsigner
+        iam_name: "{{ docsigner_user_name }}"
         policy_name: transaction_signing_queue_receiver
         state: absent
         region: "{{ aws_region }}"
@@ -15,14 +16,14 @@
     - name: "Docsigner User"
       iam:
         iam_type: user
-        name: docsigner
+        name: "{{ docsigner_user_name }}"
         state: absent
         region: "{{ aws_region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
     - name: "Transaction Signing Queue"
       sqs_queue:
-        name: transaction_signing_queue
+        name: "{{ transaction_signing_queue_name }}"
         state: absent
         region: "{{ aws_region }}"
         aws_access_key: "{{ aws_access_key }}"

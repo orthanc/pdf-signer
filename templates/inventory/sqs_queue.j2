@@ -1,1 +1,1 @@
-{{ item.name }}	arn="{{ item.queue_arn }}"	ansible_connection=local gather_facts=false
+{{ item.name }}	name="{{ item.registration.name }}"	arn="{{ item.registration.queue_arn }}"	ansible_connection=local gather_facts=false
