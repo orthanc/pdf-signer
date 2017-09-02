@@ -1,0 +1,3 @@
+# The group of severs that should run the PDF Signer script.
+[pdf_signer]
+example-server

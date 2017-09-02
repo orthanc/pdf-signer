@@ -41,14 +41,14 @@
     - name: "inventory/transaction_signing_queue"
       template:
         src: templates/inventory/sqs_queue.j2
-        dest: "inventory/{{ env_id }}/aws-transaction_signing_queue"
+        dest: "{{ inventory_dir }}/aws-transaction_signing_queue"
       listen: transaction_signing_queue_changed
       with_items:
         - "{{ transaction_signing_queue_info }}"
     - name: "inventory/docsigner_user"
       template:
         src: templates/inventory/iam_user.j2
-        dest: "inventory/{{ env_id }}/aws-docsigner_user"
+        dest: "{{ inventory_dir }}/aws-docsigner_user"
         mode: 0600
       listen: docsigner_user_changed
       with_items:

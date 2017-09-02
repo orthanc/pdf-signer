@@ -1,7 +1,7 @@
 cpdf-binaries-master
-inventory/*/host_vars/localhost.yaml
+inventory/*
+!inventory/template
 
-inventory/*/aws-*
 keys/*
 
 *.retry
