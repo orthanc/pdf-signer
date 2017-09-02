@@ -49,6 +49,7 @@
       template:
         src: templates/inventory/iam_user.j2
         dest: "inventory/{{ env_id }}/aws-docsigner_user"
+        mode: 0600
       listen: docsigner_user_changed
       with_items:
         - user_name: "{{ docsigner_user_info.user_meta.access_keys[0].user_name }}"

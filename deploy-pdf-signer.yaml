@@ -1,0 +1,30 @@
+---
+- hosts: pdf_signer
+  tasks:
+    - name: "Ensure Docsigner User Exists"
+      assert:
+        that: "'user_docsigner' in hostvars"
+        msg: "docsigner user not found, have you created the AWS infrastructure?"
+    - name: "Copy pdf-signer"
+      synchronize:
+        mode: push
+        src: "pdf-signer"
+        dest: "{{ ansible_user_dir }}/pdf-signer"
+        perms: true
+        recursive: true
+        delete: true
+        use_ssh_args: true
+    - name: "AWS Directory"
+      file:
+        path: "{{ ansible_user_dir }}/.aws"
+        state: directory
+    - name: "AWS Access Key"
+      template:
+        src: templates/aws/credentials.j2
+        dest: "{{ ansible_user_dir }}/.aws/credentials"
+        mode: 0600
+      with_items:
+        - aws_access_key: "{{ hostvars['user_docsigner']['aws_access_key'] }}"
+          aws_secret_key: "{{ hostvars['user_docsigner']['aws_secret_key'] }}"
+      loop_control:
+        label: "Credentials"

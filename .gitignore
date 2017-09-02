@@ -2,5 +2,6 @@ cpdf-binaries-master
 inventory/*/host_vars/localhost.yaml
 
 inventory/*/aws-*
+keys/*
 
 *.retry
