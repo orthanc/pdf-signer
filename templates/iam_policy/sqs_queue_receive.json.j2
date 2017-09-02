@@ -6,7 +6,8 @@
       "Action": [
         "sqs:DeleteMessage",
 	"sqs:GetQueueAttributes",
-	"sqs:ReceiveMessage"
+	"sqs:ReceiveMessage",
+	"sqs:GetQueueUrl"
       ],
       "Resource": [
         "{{ item.queue_arn }}"

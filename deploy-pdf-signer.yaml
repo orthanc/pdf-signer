@@ -5,15 +5,6 @@
       assert:
         that: "'user_docsigner' in hostvars"
         msg: "docsigner user not found, have you created the AWS infrastructure?"
-    - name: "Copy pdf-signer"
-      synchronize:
-        mode: push
-        src: "pdf-signer"
-        dest: "{{ ansible_user_dir }}/pdf-signer"
-        perms: true
-        recursive: true
-        delete: true
-        use_ssh_args: true
     - name: "AWS Directory"
       file:
         path: "{{ ansible_user_dir }}/.aws"
@@ -28,3 +19,18 @@
           aws_secret_key: "{{ hostvars['user_docsigner']['aws_secret_key'] }}"
       loop_control:
         label: "Credentials"
+
+    - name: "pdf-signer dependencies"
+      pip:
+        name:
+          - boto
+
+    - name: "Copy pdf-signer"
+      synchronize:
+        mode: push
+        src: "pdf-signer/"
+        dest: "{{ ansible_user_dir }}/pdf-signer"
+        perms: true
+        recursive: true
+        delete: true
+        use_ssh_args: true
