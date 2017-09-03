@@ -19,11 +19,13 @@
           aws_secret_key: "{{ hostvars['docsigner_user']['aws_secret_key'] }}"
       loop_control:
         label: "Credentials"
+      notify: queue_reader_changed
 
     - name: "pdf-signer dependencies"
       pip:
         name:
           - boto
+          - iso8601
 
     - name: "Copy pdf-signer"
       synchronize:
@@ -34,6 +36,7 @@
         recursive: true
         delete: true
         use_ssh_args: true
+      notify: queue_reader_changed
 
     - name: "Activate Queue Reader Cron"
       cron:
@@ -43,5 +46,13 @@
         job: sh -c "pgrep queue-reader.py > /dev/null ||
           AWS_REGION='{{ hostvars['localhost']['aws_region'] }}'
           TRANSACTION_QUEUE_NAME='{{ hostvars['transaction_signing_queue']['name'] }}'
-          {{ ansible_user_dir }}/pdf-signer/queue-reader.py"
-          
+          PYTHONUNBUFFERED=true
+          {{ ansible_user_dir }}/pdf-signer/queue-reader.py > log.txt 2>&1"
+      notify: queue_reader_changed
+  handlers:
+    - name: "Stop Queue Reader"
+      command: pkill queue-reader.py
+      register: result
+      failed_when: false
+      changed_when: "result.rc == 0"
+      listen: queue_reader_changed
