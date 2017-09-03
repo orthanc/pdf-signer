@@ -1,4 +1,16 @@
 ---
+- hosts: pdf_signer
+  tasks:
+    - name: "Deactivate Queue Reader Cron"
+      cron:
+        name: queue-reader.py
+        state: absent
+    - name: "Stop Queue Reader"
+      command: pkill queue-reader.py
+      register: result
+      failed_when: false
+      changed_when: "result.rc == 0"
+
 - hosts: localhost
   tasks:
     - set_fact:

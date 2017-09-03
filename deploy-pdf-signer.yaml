@@ -34,3 +34,14 @@
         recursive: true
         delete: true
         use_ssh_args: true
+
+    - name: "Activate Queue Reader Cron"
+      cron:
+        name: queue-reader.py
+        state: present
+        minute: "*"
+        job: sh -c "pgrep queue-reader.py > /dev/null ||
+          AWS_REGION='{{ hostvars['localhost']['aws_region'] }}'
+          TRANSACTION_QUEUE_NAME='{{ hostvars['transaction_signing_queue']['name'] }}'
+          {{ ansible_user_dir }}/pdf-signer/queue-reader.py"
+          
