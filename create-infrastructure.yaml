@@ -43,9 +43,22 @@
         region: "{{ aws_region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
-      register: transaction_signing_queue_receiver_policy_info
       with_items:
         - "{{ transaction_signing_queue_info }}"
+    - name: "PDF Store Bucket Access"
+      iam_policy:
+        iam_type: user
+        iam_name: "{{ env_prefix }}-docsigner"
+        policy_name: pdf_store_bucket_access
+        policy_json: "{{ lookup('template', 'templates/iam_policy/s3_access.json.j2') }}"
+        state: present
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+      with_items:
+        - bucket: "{{ pdf_store_bucket_info.name }}"
+          readable_keys:
+            - "templates/*"
   handlers:
     - name: "inventory/aws-transaction_signing_queue"
       template:
@@ -87,7 +100,7 @@
     - name: "Ensure Template in Bucket"
       s3:
         bucket: "{{ hostvars['pdf_store_bucket']['name'] }}"
-        object: "template.pdf"
+        object: "templates/template.pdf"
         src: "pdf-signer/template.pdf"
         mode: put
         region: "{{ aws_region }}"

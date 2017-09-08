@@ -1,0 +1,30 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+{% set first = true %}
+{% for key in item.readable_keys|default([]) %}
+{% if first %}{% set first = false %}{% else %},{% endif %}
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::{{ item.bucket }}/{{ key }}"
+      ]
+    }
+{% endfor %}
+{% for key in item.writable_keys|default([]) %}
+{% if first %}{% set first = false %}{% else %},{% endif %}
+    {
+      "Effect": "Allow",
+      "Action": [
+	"s3:PutObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::{{ item.bucket }}/{{ key }}"
+      ]
+    }
+{% endfor %}
+  ]
+}

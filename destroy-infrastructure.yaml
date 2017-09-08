@@ -17,15 +17,18 @@
         docsigner_user_name: "{{ hostvars['docsigner_user']['name'] }}"
         pdf_store_bucket_name: "{{ hostvars['pdf_store_bucket']['name'] }}"
         transaction_signing_queue_name: "{{ hostvars['transaction_signing_queue']['name'] }}"
-    - name: "Transaction Signing Queue Receiver Policy"
+    - name: "Remove IAM Policies"
       iam_policy:
         iam_type: user
         iam_name: "{{ docsigner_user_name }}"
-        policy_name: transaction_signing_queue_receiver
+        policy_name: "{{ item }}"
         state: absent
         region: "{{ aws_region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
+      with_items:
+        - transaction_signing_queue_receiver
+        - pdf_store_bucket_access
     - name: "Docsigner User"
       iam:
         iam_type: user
