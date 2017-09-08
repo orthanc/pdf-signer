@@ -49,7 +49,7 @@
         region: "{{ aws_region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
-    - name: "inventory/transaction_signing_queue"
+    - name: "inventory/aws-transaction_signing_queue"
       file:
         path: "{{ inventory_dir }}/aws-transaction_signing_queue"
         state: absent
@@ -57,7 +57,7 @@
       file:
         path: "{{ inventory_dir }}/aws-pdf_store_bucket"
         state: absent
-    - name: "inventory/docsigner_user"
+    - name: "inventory/aws-docsigner_user"
       file:
         path: "{{ inventory_dir }}/aws-docsigner_user"
         state: absent

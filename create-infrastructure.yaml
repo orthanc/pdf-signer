@@ -3,7 +3,7 @@
   tasks:
     - name: "Transaction Signing Queue"
       sqs_queue:
-        name: "{{ env_prefix }}-transaction_signing_queue"
+        name: "{{ env_prefix }}-transaction-signing-queue"
         state: present
         region: "{{ aws_region }}"
         aws_access_key: "{{ aws_access_key }}"
@@ -47,7 +47,7 @@
       with_items:
         - "{{ transaction_signing_queue_info }}"
   handlers:
-    - name: "inventory/transaction_signing_queue"
+    - name: "inventory/aws-transaction_signing_queue"
       template:
         src: templates/inventory/sqs_queue.j2
         dest: "{{ inventory_dir }}/aws-transaction_signing_queue"
@@ -63,7 +63,7 @@
       with_items:
         - name: pdf_store_bucket
           registration: "{{ pdf_store_bucket_info }}"
-    - name: "inventory/docsigner_user"
+    - name: "inventory/aws-docsigner_user"
       template:
         src: templates/inventory/iam_user.j2
         dest: "{{ inventory_dir }}/aws-docsigner_user"
