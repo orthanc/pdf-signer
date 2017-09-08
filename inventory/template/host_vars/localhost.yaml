@@ -2,6 +2,10 @@
 # The prefix to add to all aws resources created for this environment
 # typical values are dev / test / prod or similar
 env_prefix: PREFIX
+# A ULID that identifys this environment uniquely. This is used to
+# ensure a unique name for resources that must be globally unique
+# such as S3 bucket names
+env_ulid: ULID
 
 # The AWS authentication details used when deploying and destroying infrastructure.
 # It's strongly recommended this file (or at least these keys) be protected with

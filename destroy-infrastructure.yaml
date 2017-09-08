@@ -15,6 +15,7 @@
   tasks:
     - set_fact:
         docsigner_user_name: "{{ hostvars['docsigner_user']['name'] }}"
+        pdf_store_bucket_name: "{{ hostvars['pdf_store_bucket']['name'] }}"
         transaction_signing_queue_name: "{{ hostvars['transaction_signing_queue']['name'] }}"
     - name: "Transaction Signing Queue Receiver Policy"
       iam_policy:
@@ -33,6 +34,14 @@
         region: "{{ aws_region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
+    - name: "PDF Store Bucket"
+      s3_bucket:
+        name: "{{ pdf_store_bucket_name }}"
+        state: absent
+        force: true
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
     - name: "Transaction Signing Queue"
       sqs_queue:
         name: "{{ transaction_signing_queue_name }}"
@@ -43,6 +52,10 @@
     - name: "inventory/transaction_signing_queue"
       file:
         path: "{{ inventory_dir }}/aws-transaction_signing_queue"
+        state: absent
+    - name: "inventory/aws-pdf_store_bucket"
+      file:
+        path: "{{ inventory_dir }}/aws-pdf_store_bucket"
         state: absent
     - name: "inventory/docsigner_user"
       file:

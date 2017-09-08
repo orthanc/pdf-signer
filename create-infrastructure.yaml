@@ -10,6 +10,15 @@
         aws_secret_key: "{{ aws_secret_key }}"
       register: transaction_signing_queue_info
       notify: transaction_signing_queue_changed
+    - name: "PDF Store Bucket"
+      s3_bucket:
+        name: "{{ env_prefix | lower }}-pdf-store-{{ env_ulid | lower }}"
+        state: present
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+      register: pdf_store_bucket_info
+      notify: pdf_store_bucket_changed
     - name: "Docsigner User"
       iam:
         iam_type: user
@@ -46,6 +55,14 @@
       with_items:
         - name: transaction_signing_queue
           registration: "{{ transaction_signing_queue_info }}"
+    - name: "inventory/aws-pdf_store_bucket"
+      template:
+        src: templates/inventory/s3_bucket.j2
+        dest: "{{ inventory_dir }}/aws-pdf_store_bucket"
+      listen: pdf_store_bucket_changed
+      with_items:
+        - name: pdf_store_bucket
+          registration: "{{ pdf_store_bucket_info }}"
     - name: "inventory/docsigner_user"
       template:
         src: templates/inventory/iam_user.j2
@@ -64,3 +81,15 @@
   tasks:
     - name: "Reload Inventory"
       meta: refresh_inventory
+
+- hosts: localhost
+  tasks:
+    - name: "Ensure Template in Bucket"
+      s3:
+        bucket: "{{ hostvars['pdf_store_bucket']['name'] }}"
+        object: "template.pdf"
+        src: "pdf-signer/template.pdf"
+        mode: put
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
