@@ -5,26 +5,11 @@
       assert:
         that: "'docsigner_user' in hostvars"
         msg: "docsigner_user not found, have you created the AWS infrastructure?"
-    - name: "AWS Directory"
-      file:
-        path: "{{ ansible_user_dir }}/.aws"
-        state: directory
-    - name: "AWS Access Key"
-      template:
-        src: templates/aws/credentials.j2
-        dest: "{{ ansible_user_dir }}/.aws/credentials"
-        mode: 0600
-      with_items:
-        - aws_access_key: "{{ hostvars['docsigner_user']['aws_access_key'] }}"
-          aws_secret_key: "{{ hostvars['docsigner_user']['aws_secret_key'] }}"
-      loop_control:
-        label: "Credentials"
-      notify: queue_reader_changed
 
     - name: "pdf-signer dependencies"
       pip:
         name:
-          - boto
+          - boto3
           - iso8601
 
     - name: "Copy pdf-signer"
@@ -44,8 +29,11 @@
         state: present
         minute: "*"
         job: sh -c "pgrep queue-reader.py > /dev/null ||
-          AWS_REGION='{{ hostvars['localhost']['aws_region'] }}'
+          AWS_DEFAULT_REGION='{{ hostvars['localhost']['aws_region'] }}'
+          AWS_ACCESS_KEY_ID='{{ hostvars['docsigner_user']['aws_access_key'] }}'
+          AWS_SECRET_ACCESS_KEY='{{ hostvars['docsigner_user']['aws_secret_key'] }}'
           TRANSACTION_QUEUE_NAME='{{ hostvars['transaction_signing_queue']['name'] }}'
+          PDF_BUCKET_NAME='{{ hostvars['pdf_store_bucket']['name'] }}'
           PYTHONUNBUFFERED=true
           {{ ansible_user_dir }}/pdf-signer/queue-reader.py > log.txt 2>&1"
       notify: queue_reader_changed

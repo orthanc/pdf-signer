@@ -1,10 +1,5 @@
 #! /usr/bin/python
-import boto.sqs
-import iso8601
-import json
-import os
-import pprint
-import subprocess
+import boto3, iso8601, json, os, pprint, subprocess, tempfile
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 cpdf_cmd = script_dir + '/cpdf-binaries-master/Linux-Intel-32bit/cpdf'
@@ -15,16 +10,18 @@ pdf_updates = [
         {"key": "date", "x": 442, "y": 104, "page": 2}
   ]
 
-conn = boto.sqs.connect_to_region(os.environ['AWS_REGION'])
+sqs = boto3.resource('sqs')
+s3 = boto3.resource('s3')
 
-queue = conn.get_queue(os.environ['TRANSACTION_QUEUE_NAME'])
+transaction_queue = sqs.get_queue_by_name(QueueName=os.environ['TRANSACTION_QUEUE_NAME'])
+pdf_bucket = s3.Bucket(os.environ['PDF_BUCKET_NAME'])
 
 while True:
   print "Getting Messages..."
-  msg = queue.read(wait_time_seconds=20, message_attributes=['.*'])
-  if msg == None:
+  messages = transaction_queue.receive_messages(WaitTimeSeconds=20, MaxNumberOfMessages=10)
+  if len(messages):
     print "No Messages"
-  else:
+  for msg in messages:
     print "Recieved Messages:"
 #    pprint.pprint(msg)
 #    pprint.pprint(msg.id)
@@ -32,10 +29,12 @@ while True:
 #    pprint.pprint(msg.message_attributes)
 #    pprint.pprint(msg.get_body())
 
-    msg_body = json.loads(msg.get_body())
+    msg_body = json.loads(msg.body)
     pprint.pprint(msg_body)
 
     date = iso8601.parse_date(msg_body['date'])
+    template_key = msg_body['template_key']
+    result_key = msg_body['result_key']
     
     amount = msg_body['amount']
     year = format(int(date.year), '04d')
@@ -55,15 +54,13 @@ while True:
             '-stdin', str(update['page']), '-stdout' ])
       #else:
     
-    template_file = open(script_dir + '/template.pdf', 'r')
-    last_out = template_file
-    for cmd in update_commands[0:-1]:
-      last_out = subprocess.Popen(cmd, stdin = last_out, stdout = subprocess.PIPE).stdout
+    with tempfile.TemporaryFile() as template_file:
+      pdf_bucket.Object(template_key).download_fileobj(template_file)
+      template_file.seek(0)
+      last_out = template_file
+      for cmd in update_commands:
+        last_out = subprocess.Popen(cmd, stdin = last_out, stdout = subprocess.PIPE).stdout
 
-    result_file = open(script_dir + '/result.pdf', 'w')
-    subprocess.call(update_commands[-1], stdin = last_out, stdout = result_file)
-
-    result_file.close()
-    template_file.close()
+      pdf_bucket.Object(result_key).upload_fileobj(last_out)
 
     msg.delete()

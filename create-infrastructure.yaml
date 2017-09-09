@@ -97,7 +97,7 @@
       s3:
         bucket: "{{ hostvars['pdf_store_bucket']['name'] }}"
         object: "templates/template.pdf"
-        src: "pdf-signer/template.pdf"
+        src: "s3-initial-data/template.pdf"
         mode: put
         region: "{{ aws_region }}"
         aws_access_key: "{{ aws_access_key }}"
