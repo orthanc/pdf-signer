@@ -18,19 +18,22 @@
           registration: "{{ transaction_signing_queue_info }}"
     - name: "PDF Store Bucket"
       s3_bucket:
-        name: "{{ env_prefix | lower }}-pdf-store-{{ env_ulid | lower }}"
+        name: "{{ item.name }}"
         state: present
+        policy: "{{ lookup('template', 'templates/s3_policy/encrypted_bucket.json.j2') }}"
         region: "{{ aws_region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
       register: pdf_store_bucket_info
+      with_items:
+        - name: "{{ env_prefix | lower }}-pdf-store-{{ env_ulid | lower }}"
     - name: "inventory/aws-pdf_store_bucket"
       template:
         src: templates/inventory/s3_bucket.j2
         dest: "{{ inventory_dir }}/aws-pdf_store_bucket"
       with_items:
         - name: pdf_store_bucket
-          registration: "{{ pdf_store_bucket_info }}"
+          registration: "{{ pdf_store_bucket_info.results[0] }}"
     - name: "Docsigner User"
       iam:
         iam_type: user
@@ -78,7 +81,7 @@
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
       with_items:
-        - bucket: "{{ pdf_store_bucket_info.name }}"
+        - bucket: "{{ pdf_store_bucket_info.results[0].name }}"
           key_patterns:
             "templates/*": read
             "results/*": write
@@ -98,6 +101,7 @@
         bucket: "{{ hostvars['pdf_store_bucket']['name'] }}"
         object: "templates/template.pdf"
         src: "s3-initial-data/template.pdf"
+        encrypt: true
         mode: put
         region: "{{ aws_region }}"
         aws_access_key: "{{ aws_access_key }}"

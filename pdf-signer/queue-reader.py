@@ -61,6 +61,6 @@ while True:
       for cmd in update_commands:
         last_out = subprocess.Popen(cmd, stdin = last_out, stdout = subprocess.PIPE).stdout
 
-      pdf_bucket.Object(result_key).upload_fileobj(last_out)
+      pdf_bucket.Object(result_key).upload_fileobj(last_out, {"ServerSideEncryption": "AES256"})
 
     msg.delete()
