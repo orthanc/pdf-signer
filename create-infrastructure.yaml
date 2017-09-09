@@ -9,7 +9,13 @@
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
       register: transaction_signing_queue_info
-      notify: transaction_signing_queue_changed
+    - name: "inventory/aws-transaction_signing_queue"
+      template:
+        src: templates/inventory/sqs_queue.j2
+        dest: "{{ inventory_dir }}/aws-transaction_signing_queue"
+      with_items:
+        - name: transaction_signing_queue
+          registration: "{{ transaction_signing_queue_info }}"
     - name: "PDF Store Bucket"
       s3_bucket:
         name: "{{ env_prefix | lower }}-pdf-store-{{ env_ulid | lower }}"
@@ -18,7 +24,13 @@
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
       register: pdf_store_bucket_info
-      notify: pdf_store_bucket_changed
+    - name: "inventory/aws-pdf_store_bucket"
+      template:
+        src: templates/inventory/s3_bucket.j2
+        dest: "{{ inventory_dir }}/aws-pdf_store_bucket"
+      with_items:
+        - name: pdf_store_bucket
+          registration: "{{ pdf_store_bucket_info }}"
     - name: "Docsigner User"
       iam:
         iam_type: user
@@ -29,7 +41,17 @@
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
       register: docsigner_user_info
-      notify: docsigner_user_changed
+    - name: "inventory/aws-docsigner_user"
+      template:
+        src: templates/inventory/iam_user.j2
+        dest: "{{ inventory_dir }}/aws-docsigner_user"
+        mode: 0600
+      when: docsigner_user_info.changed
+      with_items:
+        - name: docsigner_user
+          registration: "{{ docsigner_user_info }}"
+      loop_control:
+        label: "{{ item.name }}"
     - set_fact:
         queue_arn: "{{ transaction_signing_queue_info.queue_arn }}"
         queue_name: "{{ transaction_signing_queue_info.name }}"
@@ -60,33 +82,6 @@
           readable_keys:
             - "templates/*"
   handlers:
-    - name: "inventory/aws-transaction_signing_queue"
-      template:
-        src: templates/inventory/sqs_queue.j2
-        dest: "{{ inventory_dir }}/aws-transaction_signing_queue"
-      listen: transaction_signing_queue_changed
-      with_items:
-        - name: transaction_signing_queue
-          registration: "{{ transaction_signing_queue_info }}"
-    - name: "inventory/aws-pdf_store_bucket"
-      template:
-        src: templates/inventory/s3_bucket.j2
-        dest: "{{ inventory_dir }}/aws-pdf_store_bucket"
-      listen: pdf_store_bucket_changed
-      with_items:
-        - name: pdf_store_bucket
-          registration: "{{ pdf_store_bucket_info }}"
-    - name: "inventory/aws-docsigner_user"
-      template:
-        src: templates/inventory/iam_user.j2
-        dest: "{{ inventory_dir }}/aws-docsigner_user"
-        mode: 0600
-      listen: docsigner_user_changed
-      with_items:
-        - name: docsigner_user
-          registration: "{{ docsigner_user_info }}"
-      loop_control:
-        label: "{{ item.name }}"
 
 - hosts: localhost
   connection: local
