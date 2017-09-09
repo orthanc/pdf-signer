@@ -1,25 +1,21 @@
 {
   "Version": "2012-10-17",
   "Statement": [
-{% set first = true %}
-{% for key in item.readable_keys|default([]) %}
-{% if first %}{% set first = false %}{% else %},{% endif %}
+{% for key, mode in item.key_patterns.iteritems() %}
+{% if loop.index != 1 %},{% endif %}
     {
       "Effect": "Allow",
       "Action": [
-        "s3:GetObject"
-      ],
-      "Resource": [
-        "arn:aws:s3:::{{ item.bucket }}/{{ key }}"
-      ]
-    }
-{% endfor %}
-{% for key in item.writable_keys|default([]) %}
-{% if first %}{% set first = false %}{% else %},{% endif %}
-    {
-      "Effect": "Allow",
-      "Action": [
+{% if mode == 'read_write' %}
+        "s3:GetObject",
 	"s3:PutObject"
+{% elif mode == 'read' %}
+        "s3:GetObject"
+{% elif mode == 'write' %}
+	"s3:PutObject"
+{% else %}
+        "{{ mode }}"
+{% endif %}
       ],
       "Resource": [
         "arn:aws:s3:::{{ item.bucket }}/{{ key }}"

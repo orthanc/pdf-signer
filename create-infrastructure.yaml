@@ -79,8 +79,9 @@
         aws_secret_key: "{{ aws_secret_key }}"
       with_items:
         - bucket: "{{ pdf_store_bucket_info.name }}"
-          readable_keys:
-            - "templates/*"
+          key_patterns:
+            "templates/*": read
+            "results/*": write
   handlers:
 
 - hosts: localhost
