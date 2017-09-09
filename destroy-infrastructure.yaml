@@ -11,56 +11,60 @@
       failed_when: false
       changed_when: "result.rc == 0"
 
-- hosts: localhost
+- hosts: docsigner_user
   tasks:
-    - set_fact:
-        docsigner_user_name: "{{ hostvars['docsigner_user']['name'] }}"
-        pdf_store_bucket_name: "{{ hostvars['pdf_store_bucket']['name'] }}"
-        transaction_signing_queue_name: "{{ hostvars['transaction_signing_queue']['name'] }}"
+    - name: "Find IAM Policies"
+      iam_policy:
+        iam_type: user
+        iam_name: "{{ name }}"
+        policy_name: deny-all
+        policy_json: "{{ lookup('template', 'templates/iam_policy/deny_all.json.j2') }}"
+        state: present
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+      register: iam_policy_info
     - name: "Remove IAM Policies"
       iam_policy:
         iam_type: user
-        iam_name: "{{ docsigner_user_name }}"
+        iam_name: "{{ name }}"
         policy_name: "{{ item }}"
         state: absent
         region: "{{ aws_region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
-      with_items:
-        - transaction_signing_queue_receiver
-        - pdf_store_bucket_access
+      with_items: "{{ iam_policy_info.policies }}"
+
+- hosts: localhost
+  tasks:
     - name: "Docsigner User"
       iam:
         iam_type: user
-        name: "{{ docsigner_user_name }}"
+        name: "{{ hostvars['docsigner_user'].name }}"
         state: absent
         region: "{{ aws_region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
     - name: "PDF Store Bucket"
       s3_bucket:
-        name: "{{ pdf_store_bucket_name }}"
+        name: "{{ hostvars['pdf_store_bucket'].name }}"
         state: absent
         force: true
-        region: "{{ aws_region }}"
+        region: "{{ hostvars['pdf_store_bucket'].region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
     - name: "Transaction Signing Queue"
       sqs_queue:
-        name: "{{ transaction_signing_queue_name }}"
+        name: "{{ hostvars['transaction_signing_queue'].name }}"
         state: absent
-        region: "{{ aws_region }}"
+        region: "{{ hostvars['transaction_signing_queue'].region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
-    - name: "inventory/aws-transaction_signing_queue"
+    - name: "Delete AWS Inventory"
       file:
-        path: "{{ inventory_dir }}/aws-transaction_signing_queue"
+        path: "{{ inventory_dir }}/{{ item }}"
         state: absent
-    - name: "inventory/aws-pdf_store_bucket"
-      file:
-        path: "{{ inventory_dir }}/aws-pdf_store_bucket"
-        state: absent
-    - name: "inventory/aws-docsigner_user"
-      file:
-        path: "{{ inventory_dir }}/aws-docsigner_user"
-        state: absent
+      with_items:
+        - aws-transaction_signing_queue
+        - aws-pdf_store_bucket
+        - aws-docsigner_user

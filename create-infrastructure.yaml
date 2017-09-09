@@ -16,6 +16,9 @@
       with_items:
         - name: transaction_signing_queue
           registration: "{{ transaction_signing_queue_info }}"
+      loop_control:
+        label: "{{ item.name }}"
+
     - name: "PDF Store Bucket"
       s3_bucket:
         name: "{{ item.name }}"
@@ -24,16 +27,22 @@
         region: "{{ aws_region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
-      register: pdf_store_bucket_info
+      register: pdf_store_bucket_info_list
       with_items:
         - name: "{{ env_prefix | lower }}-pdf-store-{{ env_ulid | lower }}"
+    - name: "PDF Store Bucket Info"
+      set_fact:
+        pdf_store_bucket_info: "{{ pdf_store_bucket_info_list.results[0] }}"
     - name: "inventory/aws-pdf_store_bucket"
       template:
         src: templates/inventory/s3_bucket.j2
         dest: "{{ inventory_dir }}/aws-pdf_store_bucket"
       with_items:
         - name: pdf_store_bucket
-          registration: "{{ pdf_store_bucket_info.results[0] }}"
+          registration: "{{ pdf_store_bucket_info }}"
+      loop_control:
+        label: "{{ item.name }}"
+
     - name: "Docsigner User"
       iam:
         iam_type: user
@@ -55,13 +64,16 @@
           registration: "{{ docsigner_user_info }}"
       loop_control:
         label: "{{ item.name }}"
-    - set_fact:
-        queue_arn: "{{ transaction_signing_queue_info.queue_arn }}"
-        queue_name: "{{ transaction_signing_queue_info.name }}"
+
+    - name: "Reload Inventory"
+      meta: refresh_inventory
+
+- hosts: docsigner_user
+  tasks:
     - name: "Transaction Signing Queue Receiver Policy"
       iam_policy:
         iam_type: user
-        iam_name: "{{ env_prefix }}-docsigner"
+        iam_name: "{{ name }}"
         policy_name: transaction_signing_queue_receiver
         policy_json: "{{ lookup('template', 'templates/iam_policy/sqs_queue_receive.json.j2') }}"
         state: present
@@ -69,11 +81,13 @@
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
       with_items:
-        - "{{ transaction_signing_queue_info }}"
+        - "{{ hostvars['transaction_signing_queue'] }}"
+      loop_control:
+        label: "{{ item.name }}"
     - name: "PDF Store Bucket Access"
       iam_policy:
         iam_type: user
-        iam_name: "{{ env_prefix }}-docsigner"
+        iam_name: "{{ name }}"
         policy_name: pdf_store_bucket_access
         policy_json: "{{ lookup('template', 'templates/iam_policy/s3_access.json.j2') }}"
         state: present
@@ -81,24 +95,19 @@
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
       with_items:
-        - bucket: "{{ pdf_store_bucket_info.results[0].name }}"
+        - name: pdf_store_bucket
+          arn: "{{ hostvars['pdf_store_bucket'].arn }}"
           key_patterns:
             "templates/*": read
             "results/*": write
-  handlers:
+      loop_control:
+        label: "{{ item.name }}"
 
-- hosts: localhost
-  connection: local
-  gather_facts: false
-  tasks:
-    - name: "Reload Inventory"
-      meta: refresh_inventory
-
-- hosts: localhost
+- hosts: pdf_store_bucket
   tasks:
     - name: "Ensure Template in Bucket"
       s3:
-        bucket: "{{ hostvars['pdf_store_bucket']['name'] }}"
+        bucket: "{{ name }}"
         object: "templates/template.pdf"
         src: "s3-initial-data/template.pdf"
         encrypt: true

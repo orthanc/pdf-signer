@@ -18,7 +18,7 @@
 {% endif %}
       ],
       "Resource": [
-        "arn:aws:s3:::{{ item.bucket }}/{{ key }}"
+        "{{ item.arn }}/{{ key }}"
       ]
     }
 {% endfor %}

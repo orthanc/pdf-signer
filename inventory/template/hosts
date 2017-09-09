@@ -1,3 +1,7 @@
 # The group of severs that should run the PDF Signer script.
 [pdf_signer]
 example-server
+
+# Puting localhost into the aws_control group gives it access to the aws credentials
+[aws_control]
+localhost

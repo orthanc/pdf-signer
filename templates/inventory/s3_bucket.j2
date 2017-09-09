@@ -1,1 +1,2 @@
-{{ item.name }}	name="{{ item.registration.name }}"	ansible_connection=local gather_facts=false
+[aws_control]
+{{ item.name }}	name="{{ item.registration.name }}"	arn="arn:aws:s3:::{{ item.registration.name }}"	region="{{ aws_region }}"

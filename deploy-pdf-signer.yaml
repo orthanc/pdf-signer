@@ -29,11 +29,11 @@
         state: present
         minute: "*"
         job: sh -c "pgrep queue-reader.py > /dev/null ||
-          AWS_DEFAULT_REGION='{{ hostvars['localhost']['aws_region'] }}'
-          AWS_ACCESS_KEY_ID='{{ hostvars['docsigner_user']['aws_access_key'] }}'
-          AWS_SECRET_ACCESS_KEY='{{ hostvars['docsigner_user']['aws_secret_key'] }}'
-          TRANSACTION_QUEUE_NAME='{{ hostvars['transaction_signing_queue']['name'] }}'
-          PDF_BUCKET_NAME='{{ hostvars['pdf_store_bucket']['name'] }}'
+          AWS_ACCESS_KEY_ID='{{ hostvars['docsigner_user'].user_aws_access_key }}'
+          AWS_SECRET_ACCESS_KEY='{{ hostvars['docsigner_user'].user_aws_secret_key }}'
+          AWS_DEFAULT_REGION='{{ hostvars['transaction_signing_queue'].region }}'
+          TRANSACTION_QUEUE_NAME='{{ hostvars['transaction_signing_queue'].name }}'
+          PDF_BUCKET_NAME='{{ hostvars['pdf_store_bucket'].name }}'
           PYTHONUNBUFFERED=true
           {{ ansible_user_dir }}/pdf-signer/queue-reader.py > log.txt 2>&1"
       notify: queue_reader_changed

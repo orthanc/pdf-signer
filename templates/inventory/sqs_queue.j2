@@ -1,1 +1,2 @@
-{{ item.name }}	name="{{ item.registration.name }}"	arn="{{ item.registration.queue_arn }}"	ansible_connection=local gather_facts=false
+[aws_control]
+{{ item.name }}	name="{{ item.registration.name }}"	arn="{{ item.registration.queue_arn }}"	region="{{ aws_region }}"
