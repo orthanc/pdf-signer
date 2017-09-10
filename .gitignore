@@ -1,7 +1,11 @@
 cpdf-binaries-master
 inventory/*
 !inventory/template
+ansible-user-provisioning/inventory/*
+!ansible-user-provisioning/inventory/ansible-admin
+ansible-user-provisioning/inventory/ansible-admin/host_vars/localhost/*
 
 keys/*
+s3-initial-data/*
 
 *.swp
