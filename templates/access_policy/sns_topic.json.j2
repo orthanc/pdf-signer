@@ -1,0 +1,36 @@
+{
+  "Version": "2012-10-17",
+  "Id": "{{ item.name }}-policy",
+  "Statement": [
+    {
+      "Sid": "DenyUnEncryptedTransport",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": [
+        "sns:Publish",
+        "sns:Subscribe",
+        "sns:Receive"
+      ],
+      "Resource": "arn:aws:sns:{{ aws_region }}:{{ aws_account }}:{{ item.name }}",
+      "Condition": {
+        "BoolIfExists": {
+          "aws:SecureTransport": "false"
+        }
+      }
+    }{% for access in item.access %},
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "{{ access.user_arn }}"
+      },
+      "Action": {% if access.mode == 'send' %}"sns:Publish"
+{% elif mode == 'receive' %}[
+        "sns:Subscribe",
+        "sns:Receive"
+      ]
+{% else %} "{{ access.mode }}"
+{% endif %},
+      "Resource": "arn:aws:sns:{{ aws_region }}:{{ aws_account }}:{{ item.name }}"
+    }{% endfor %}
+  ]
+}

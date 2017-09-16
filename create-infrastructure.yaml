@@ -63,6 +63,33 @@
       loop_control:
         label: "{{ item.name }}"
 
+    - name: "Signing Events Topic"
+      sns_topic:
+        name: "{{ env_prefix }}-signing-events-topic"
+        state: present
+        policy: "{{ lookup('template', 'templates/access_policy/sns_topic.json.j2') }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        security_token: "{{ security_token }}"
+      register: signing_events_topic_info_list
+      with_items:
+        - name: "{{ env_prefix }}-signing-events-topic"
+          access:
+            - user_arn: "{{ hostvars['docsigner_user'].arn }}"
+              mode: send
+      loop_control:
+        label: "{{ item.name }}"
+    - name: "inventory/aws-signing_events_topic"
+      template:
+        src: templates/inventory/sns_topic.j2
+        dest: "{{ inventory_dir }}/aws-signing_events_topic"
+      with_items:
+        - name: signing_events_topic
+          registration: "{{ signing_events_topic_info_list.results[0] }}"
+      loop_control:
+        label: "{{ item.name }}"
+
     - name: "PDF Store Bucket"
       s3_bucket:
         name: "{{ item.name }}"

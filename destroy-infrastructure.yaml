@@ -15,6 +15,14 @@
 
 - hosts: localhost
   tasks:
+    - name: "Signing Events Topic"
+      sns_topic:
+        name: "{{ hostvars['signing_events_topic'].name }}"
+        state: absent
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        security_token: "{{ security_token }}"
     - name: "PDF Store Bucket"
       s3_bucket:
         name: "{{ hostvars['pdf_store_bucket'].name }}"
@@ -48,4 +56,5 @@
       with_items:
         - aws-transaction_signing_queue
         - aws-pdf_store_bucket
+        - aws-signing_events_topic
         - aws-docsigner_user
