@@ -5,3 +5,10 @@ example-server
 # Puting localhost into the aws_control group gives it access to the aws credentials
 [aws_control]
 localhost
+
+# Puting aws services into the aws_control group gives them access to the aws credentials
+[aws_control:children]
+aws_iam_user
+aws_s3_bucket
+aws_sns_topic
+aws_sqs_queue

@@ -1,5 +1,6 @@
 ---
 - include: includes/obtain_session_token.yaml
+- include: includes/aws_creds_host_facts.yaml
 
 - hosts: pdf_signer
   tasks:
@@ -13,48 +14,56 @@
       failed_when: false
       changed_when: "result.rc == 0"
 
-- hosts: localhost
+- hosts: aws_sns_topic
   tasks:
-    - name: "Signing Events Topic"
+    - name: "{{ inventory_hostname }}"
       sns_topic:
-        name: "{{ hostvars['signing_events_topic'].name }}"
+        name: "{{ name }}"
         state: absent
-        region: "{{ aws_region }}"
+        region: "{{ region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
         security_token: "{{ security_token }}"
-    - name: "PDF Store Bucket"
+
+- hosts: aws_s3_bucket
+  tasks:
+    - name: "{{ inventory_hostname }}"
       s3_bucket:
-        name: "{{ hostvars['pdf_store_bucket'].name }}"
+        name: "{{ name }}"
         state: absent
         force: true
-        region: "{{ hostvars['pdf_store_bucket'].region }}"
+        region: "{{ region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
         security_token: "{{ security_token }}"
-    - name: "Transaction Signing Queue"
+
+- hosts: aws_sqs_queue
+  tasks:
+    - name: "{{ inventory_hostname }}"
       sqs_queue:
-        name: "{{ hostvars['transaction_signing_queue'].name }}"
+        name: "{{ name }}"
         state: absent
-        region: "{{ hostvars['transaction_signing_queue'].region }}"
+        region: "{{ region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
         security_token: "{{ security_token }}"
-    - name: "Docsigner User"
+
+- hosts: aws_iam_user
+  tasks:
+    - name: "{{ inventory_hostname }}"
       iam:
         iam_type: user
-        name: "{{ hostvars['docsigner_user'].name }}"
+        name: "{{ name }}"
         state: absent
         region: "{{ aws_region }}"
         aws_access_key: "{{ iam_aws_access_key }}"
         aws_secret_key: "{{ iam_aws_secret_key }}"
         security_token: "{{ iam_security_token|default(omit) }}"
+
+- hosts: localhost
+  tasks:
     - name: "Delete AWS Inventory"
       file:
-        path: "{{ inventory_dir }}/{{ item }}"
+        path: "{{ item }}"
         state: absent
-      with_items:
-        - aws-transaction_signing_queue
-        - aws-pdf_store_bucket
-        - aws-signing_events_topic
-        - aws-docsigner_user
+      with_fileglob: "{{ inventory_dir }}/aws-*"
