@@ -1,0 +1,33 @@
+{
+  "Version": "2012-10-17",
+  "Id": "{{ item.name }}-policy",
+  "Statement": [
+    {
+      "Sid": "DenyUnEncryptedTransport",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "sqs:*",
+      "Resource": "arn:aws:sqs:{{ aws_region }}:{{ aws_account }}:{{ item.name }}",
+      "Condition": {
+        "BoolIfExists": {
+          "aws:SecureTransport": "false"
+        }
+      }
+    }{% for access in item.access %},
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "{{ access.user_arn }}"
+      },
+      "Action": {% if access.mode == 'read' %}[
+        "sqs:DeleteMessage",
+        "sqs:GetQueueAttributes",
+        "sqs:ReceiveMessage",
+        "sqs:GetQueueUrl"
+      ]
+{% else %} "{{ access.mode }}"
+{% endif %},
+      "Resource": "arn:aws:sqs:{{ aws_region }}:{{ aws_account }}:{{ item.name }}"
+    }{% endfor %}
+  ]
+}

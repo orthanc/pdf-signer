@@ -1,2 +1,2 @@
 [aws_control]
-{{ item.name }}	name="{{ item.registration.user_meta.access_keys[0].user_name }}"	user_aws_access_key="{{ item.registration.user_meta.access_keys[0].access_key_id }}"	user_aws_secret_key="{{ item.registration.user_meta.access_keys[0].secret_access_key }}"
+{{ item.name }}	name="{{ item.registration.user_meta.access_keys[0].user_name }}"	arn="{{ item.registration.user_meta.created_user.arn }}"  user_aws_access_key="{{ item.registration.user_meta.access_keys[0].access_key_id }}"	user_aws_secret_key="{{ item.registration.user_meta.access_keys[0].secret_access_key }}"

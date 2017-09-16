@@ -1,0 +1,45 @@
+{
+  "Version": "2012-10-17",
+  "Id": "{{ item.name }}-policy",
+  "Statement": [
+    {
+      "Sid": "DenyUnEncryptedTransport",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "*",
+      "Resource": "arn:aws:s3:::{{ item.name }}/*",
+      "Condition": {
+        "BoolIfExists": {
+          "aws:SecureTransport": "false"
+        }
+      }
+    },
+    {
+      "Sid": "DenyUnEncryptedObjectUploads",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::{{ item.name }}/*",
+      "Condition": {
+        "StringNotEqualsIfExists": {
+          "s3:x-amz-server-side-encryption": "AES256"
+        }
+      }
+    }{% for access in item.access %}{% for key, mode in access.key_patterns.iteritems() %},
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "{{ access.user_arn }}"
+      },
+      "Action": {% if mode == 'read_write' %}[
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+{% elif mode == 'read' %}"s3:GetObject",
+{% elif mode == 'write' %} "s3:PutObject",
+{% else %} "{{ mode }}",
+{% endif %}
+      "Resource": "arn:aws:s3:::{{ item.name }}/{{ key }}"
+    }{% endfor %}{% endfor %}
+  ]
+}

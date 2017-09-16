@@ -1,4 +1,6 @@
 ---
+- include: includes/obtain_session_token.yaml
+
 - hosts: pdf_signer
   tasks:
     - name: "Deactivate Queue Reader Cron"
@@ -11,40 +13,8 @@
       failed_when: false
       changed_when: "result.rc == 0"
 
-- hosts: docsigner_user
-  tasks:
-    - name: "Find IAM Policies"
-      iam_policy:
-        iam_type: user
-        iam_name: "{{ name }}"
-        policy_name: deny-all
-        policy_json: "{{ lookup('template', 'templates/iam_policy/deny_all.json.j2') }}"
-        state: present
-        region: "{{ aws_region }}"
-        aws_access_key: "{{ aws_access_key }}"
-        aws_secret_key: "{{ aws_secret_key }}"
-      register: iam_policy_info
-    - name: "Remove IAM Policies"
-      iam_policy:
-        iam_type: user
-        iam_name: "{{ name }}"
-        policy_name: "{{ item }}"
-        state: absent
-        region: "{{ aws_region }}"
-        aws_access_key: "{{ aws_access_key }}"
-        aws_secret_key: "{{ aws_secret_key }}"
-      with_items: "{{ iam_policy_info.policies }}"
-
 - hosts: localhost
   tasks:
-    - name: "Docsigner User"
-      iam:
-        iam_type: user
-        name: "{{ hostvars['docsigner_user'].name }}"
-        state: absent
-        region: "{{ aws_region }}"
-        aws_access_key: "{{ aws_access_key }}"
-        aws_secret_key: "{{ aws_secret_key }}"
     - name: "PDF Store Bucket"
       s3_bucket:
         name: "{{ hostvars['pdf_store_bucket'].name }}"
@@ -53,6 +23,7 @@
         region: "{{ hostvars['pdf_store_bucket'].region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
+        security_token: "{{ security_token }}"
     - name: "Transaction Signing Queue"
       sqs_queue:
         name: "{{ hostvars['transaction_signing_queue'].name }}"
@@ -60,6 +31,16 @@
         region: "{{ hostvars['transaction_signing_queue'].region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
+        security_token: "{{ security_token }}"
+    - name: "Docsigner User"
+      iam:
+        iam_type: user
+        name: "{{ hostvars['docsigner_user'].name }}"
+        state: absent
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ iam_aws_access_key }}"
+        aws_secret_key: "{{ iam_aws_secret_key }}"
+        security_token: "{{ iam_security_token|default(omit) }}"
     - name: "Delete AWS Inventory"
       file:
         path: "{{ inventory_dir }}/{{ item }}"
