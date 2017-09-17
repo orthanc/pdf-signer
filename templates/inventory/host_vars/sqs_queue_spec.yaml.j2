@@ -1,5 +1,5 @@
 ---
-{% set name = env_prefix|lower + '-' + item.key|replace('_', '-')|lower %}
+{% set name = env_prefix|lower + '-' + inventory_hostname|replace('_', '-')|lower %}
 name: "{{ name }}"
 region: "{{ aws_region }}"
 arn: "arn:aws:sqs:{{ aws_region }}:{{ aws_account }}:{{ name }}"

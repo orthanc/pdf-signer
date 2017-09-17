@@ -15,8 +15,10 @@
       changed_when: "result.rc == 0"
 
 - hosts: aws_sns_topic
+  vars_files:
+    - infrastructure.yaml
   tasks:
-    - name: "{{ inventory_hostname }}"
+    - name: "sns_topic"
       sns_topic:
         name: "{{ name }}"
         state: absent
@@ -26,8 +28,10 @@
         security_token: "{{ security_token }}"
 
 - hosts: aws_s3_bucket
+  vars_files:
+    - infrastructure.yaml
   tasks:
-    - name: "{{ inventory_hostname }}"
+    - name: "s3_bucket"
       s3_bucket:
         name: "{{ name }}"
         state: absent
@@ -38,8 +42,10 @@
         security_token: "{{ security_token }}"
 
 - hosts: aws_sqs_queue
+  vars_files:
+    - infrastructure.yaml
   tasks:
-    - name: "{{ inventory_hostname }}"
+    - name: "sqs_queue"
       sqs_queue:
         name: "{{ name }}"
         state: absent
@@ -52,7 +58,7 @@
   vars_files:
     - infrastructure.yaml
   tasks:
-    - name: "{{ inventory_hostname }}"
+    - name: "iam_user"
       iam:
         iam_type: user
         name: "{{ name }}"

@@ -3,18 +3,29 @@
 {{ name }}
 {% endfor %}
 
+[aws_iam_user:vars]
+aws_type=iam_user
+
 [aws_sqs_queue]
 {% for name, item in aws_logical_inventory.sqs_queues.iteritems() %}
 {{ name }}
 {% endfor %}
+
+[aws_sqs_queue:vars]
+aws_type=sqs_queue
 
 [aws_sns_topic]
 {% for name, item in aws_logical_inventory.sns_topics.iteritems() %}
 {{ name }}
 {% endfor %}
 
+[aws_sns_topic:vars]
+aws_type=sns_topic
+
 [aws_s3_bucket]
 {% for name, item in aws_logical_inventory.s3_buckets.iteritems() %}
 {{ name }}
 {% endfor %}
 
+[aws_s3_bucket:vars]
+aws_type=s3_bucket

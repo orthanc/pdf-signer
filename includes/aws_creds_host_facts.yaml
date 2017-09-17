@@ -1,5 +1,5 @@
 ---
-- hosts: aws_control:!localhost
+- hosts: aws_service
   tasks:
     - name: "Setup Temporary Credentials"
       set_fact:
