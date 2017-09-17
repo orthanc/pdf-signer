@@ -1,0 +1,4 @@
+---
+- include: includes/obtain_session_token.yaml
+- include: destroy-infrastructure.yaml
+- include: destroy-inventory.yaml
