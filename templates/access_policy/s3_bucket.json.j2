@@ -1,13 +1,13 @@
 {
   "Version": "2012-10-17",
-  "Id": "{{ item.name }}-policy",
+  "Id": "{{ name }}-policy",
   "Statement": [
     {
       "Sid": "DenyUnEncryptedTransport",
       "Effect": "Deny",
       "Principal": "*",
       "Action": "*",
-      "Resource": "arn:aws:s3:::{{ item.name }}/*",
+      "Resource": "{{ arn }}/*",
       "Condition": {
         "BoolIfExists": {
           "aws:SecureTransport": "false"
@@ -19,17 +19,17 @@
       "Effect": "Deny",
       "Principal": "*",
       "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::{{ item.name }}/*",
+      "Resource": "{{ arn }}/*",
       "Condition": {
         "StringNotEqualsIfExists": {
           "s3:x-amz-server-side-encryption": "AES256"
         }
       }
-    }{% for access in item.access %}{% for key, mode in access.key_patterns.iteritems() %},
+    }{% for access in aws_logical_inventory.s3_buckets[inventory_hostname].access %}{% for key, mode in access.key_patterns.iteritems() %},
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "{{ access.user_arn }}"
+        "AWS": "{{ hostvars[access.user].arn }}"
       },
       "Action": {% if mode == 'read_write' %}[
         "s3:GetObject",
@@ -39,7 +39,7 @@
 {% elif mode == 'write' %} "s3:PutObject",
 {% else %} "{{ mode }}",
 {% endif %}
-      "Resource": "arn:aws:s3:::{{ item.name }}/{{ key }}"
+      "Resource": "{{ arn }}/{{ key }}"
     }{% endfor %}{% endfor %}
   ]
 }

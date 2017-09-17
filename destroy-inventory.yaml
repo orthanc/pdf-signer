@@ -1,0 +1,29 @@
+---
+- hosts: localhost
+  vars_files:
+    - infrastructure.yaml
+  tasks:
+    - name: "inventory/aws_services"
+      file:
+        path: "{{ inventory_dir }}/aws_services"
+        state: absent
+    - name: "inventory/host_vars/aws_user"
+      file:
+        path: "{{ inventory_dir }}/host_vars/{{ item.key }}"
+        state: absent
+      with_dict: "{{ aws_logical_inventory.iam_users }}"
+    - name: "inventory/host_vars/aws_queue"
+      file:
+        path: "{{ inventory_dir }}/host_vars/{{ item.key }}"
+        state: absent
+      with_dict: "{{ aws_logical_inventory.sqs_queues }}"
+    - name: "inventory/host_vars/aws_topic"
+      file:
+        path: "{{ inventory_dir }}/host_vars/{{ item.key }}"
+        state: absent
+      with_dict: "{{ aws_logical_inventory.sns_topics }}"
+    - name: "inventory/host_vars/aws_bucket"
+      file:
+        path: "{{ inventory_dir }}/host_vars/{{ item.key }}"
+        state: absent
+      with_dict: "{{ aws_logical_inventory.s3_buckets }}"

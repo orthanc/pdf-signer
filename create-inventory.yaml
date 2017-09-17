@@ -1,0 +1,61 @@
+---
+- hosts: localhost
+  vars_files:
+    - infrastructure.yaml
+  tasks:
+    - name: "inventory/aws_services"
+      template:
+        src: templates/inventory/aws_services.j2
+        dest: "{{ inventory_dir }}/aws_services"
+    - name: "inventory/host_vars/aws_user"
+      file:
+        path: "{{ inventory_dir }}/host_vars/{{ item.key }}"
+        state: directory
+      with_dict: "{{ aws_logical_inventory.iam_users }}"
+    - name: "inventory/host_vars/aws_user/aws_service_spec.yaml"
+      template:
+        src: templates/inventory/host_vars/iam_user_spec.yaml.j2
+        dest: "{{ inventory_dir }}/host_vars/{{ item.key }}/aws_service_spec.yaml"
+      with_dict: "{{ aws_logical_inventory.iam_users }}"
+
+    - name: "inventory/host_vars/aws_queue"
+      file:
+        path: "{{ inventory_dir }}/host_vars/{{ item.key }}"
+        state: directory
+      with_dict: "{{ aws_logical_inventory.sqs_queues }}"
+    - name: "inventory/host_vars/aws_queue/aws_service_spec.yaml"
+      template:
+        src: templates/inventory/host_vars/sqs_queue_spec.yaml.j2
+        dest: "{{ inventory_dir }}/host_vars/{{ item.key }}/aws_service_spec.yaml"
+      with_dict: "{{ aws_logical_inventory.sqs_queues }}"
+
+    - name: "inventory/host_vars/aws_topic"
+      file:
+        path: "{{ inventory_dir }}/host_vars/{{ item.key }}"
+        state: directory
+      with_dict: "{{ aws_logical_inventory.sns_topics }}"
+    - name: "inventory/host_vars/aws_topic/aws_service_spec.yaml"
+      template:
+        src: templates/inventory/host_vars/sns_topic_spec.yaml.j2
+        dest: "{{ inventory_dir }}/host_vars/{{ item.key }}/aws_service_spec.yaml"
+      with_dict: "{{ aws_logical_inventory.sns_topics }}"
+
+    - name: "inventory/host_vars/aws_bucket"
+      file:
+        path: "{{ inventory_dir }}/host_vars/{{ item.key }}"
+        state: directory
+      with_dict: "{{ aws_logical_inventory.s3_buckets }}"
+    - name: "inventory/host_vars/aws_bucket/aws_service_spec.yaml"
+      template:
+        src: templates/inventory/host_vars/s3_bucket_spec.yaml.j2
+        dest: "{{ inventory_dir }}/host_vars/{{ item.key }}/aws_service_spec.yaml"
+      with_dict: "{{ aws_logical_inventory.s3_buckets }}"
+
+    - name: "Reload Inventory"
+      meta: refresh_inventory
+
+- hosts: aws_control:!localhost
+  tasks:
+    - name: "Load Service Spec"
+      include_vars:
+        file: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}/aws_service_spec.yaml"

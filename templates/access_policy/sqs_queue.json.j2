@@ -1,23 +1,23 @@
 {
   "Version": "2012-10-17",
-  "Id": "{{ item.name }}-policy",
+  "Id": "{{ name }}-policy",
   "Statement": [
     {
       "Sid": "DenyUnEncryptedTransport",
       "Effect": "Deny",
       "Principal": "*",
       "Action": "sqs:*",
-      "Resource": "arn:aws:sqs:{{ aws_region }}:{{ aws_account }}:{{ item.name }}",
+      "Resource": "{{ arn }}",
       "Condition": {
         "BoolIfExists": {
           "aws:SecureTransport": "false"
         }
       }
-    }{% for access in item.access %},
+    }{% for access in aws_logical_inventory.sqs_queues[inventory_hostname].access %},
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "{{ access.user_arn }}"
+        "AWS": "{{ hostvars[access.user].arn }}"
       },
       "Action": {% if access.mode == 'read' %}[
         "sqs:DeleteMessage",
@@ -27,7 +27,7 @@
       ]
 {% else %} "{{ access.mode }}"
 {% endif %},
-      "Resource": "arn:aws:sqs:{{ aws_region }}:{{ aws_account }}:{{ item.name }}"
+      "Resource": "{{ arn }}"
     }{% endfor %}
   ]
 }

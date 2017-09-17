@@ -1,0 +1,20 @@
+[aws_iam_user]
+{% for name, item in aws_logical_inventory.iam_users.iteritems() %}
+{{ name }}
+{% endfor %}
+
+[aws_sqs_queue]
+{% for name, item in aws_logical_inventory.sqs_queues.iteritems() %}
+{{ name }}
+{% endfor %}
+
+[aws_sns_topic]
+{% for name, item in aws_logical_inventory.sns_topics.iteritems() %}
+{{ name }}
+{% endfor %}
+
+[aws_s3_bucket]
+{% for name, item in aws_logical_inventory.s3_buckets.iteritems() %}
+{{ name }}
+{% endfor %}
+

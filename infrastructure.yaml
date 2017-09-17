@@ -1,0 +1,21 @@
+---
+aws_logical_inventory:
+  iam_users:
+    docsigner_user:
+  sqs_queues:
+    transaction_signing_queue:
+      access:
+        - user: docsigner_user
+          mode: read
+  sns_topics:
+    signing_events_topic:
+      access:
+        - user: docsigner_user
+          mode: send
+  s3_buckets:
+    pdf_store_bucket:
+      access:
+        - user: docsigner_user
+          key_patterns:
+            "templates/*": read
+            "results/*": write

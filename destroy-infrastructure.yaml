@@ -49,6 +49,8 @@
         security_token: "{{ security_token }}"
 
 - hosts: aws_iam_user
+  vars_files:
+    - infrastructure.yaml
   tasks:
     - name: "{{ inventory_hostname }}"
       iam:
@@ -59,11 +61,7 @@
         aws_access_key: "{{ iam_aws_access_key }}"
         aws_secret_key: "{{ iam_aws_secret_key }}"
         security_token: "{{ iam_security_token|default(omit) }}"
-
-- hosts: localhost
-  tasks:
-    - name: "Delete AWS Inventory"
+    - name: "inventory/host_vars/aws_user/aws_user_creds.yaml"
       file:
-        path: "{{ item }}"
+        path: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}/aws_user_creds.yaml"
         state: absent
-      with_fileglob: "{{ inventory_dir }}/aws-*"
