@@ -1,11 +1,7 @@
-cpdf-binaries-master
-inventory/*
-!inventory/template
-ansible-user-provisioning/inventory/*
-!ansible-user-provisioning/inventory/ansible-admin
-ansible-user-provisioning/inventory/ansible-admin/host_vars/localhost/*
-
-keys/*
-test-data/s3-initial-data/*
+/pdf-signer/cpdf-binaries-master
+/deploy/inventory/*
+!/deploy/inventory/template
+/deploy/keys
+/deploy/test-data/s3-initial-data
 
 *.swp
