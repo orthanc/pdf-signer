@@ -78,17 +78,3 @@
         aws_secret_key: "{{ aws_secret_key }}"
         security_token: "{{ security_token }}"
       register: bucket_info
-
-- hosts: pdf_store_bucket
-  tasks:
-    - name: "Ensure Template in Bucket"
-      s3:
-        bucket: "{{ name }}"
-        object: "templates/template.pdf"
-        src: "s3-initial-data/template.pdf"
-        encrypt: true
-        mode: put
-        region: "{{ aws_region }}"
-        aws_access_key: "{{ aws_access_key }}"
-        aws_secret_key: "{{ aws_secret_key }}"
-        security_token: "{{ security_token }}"

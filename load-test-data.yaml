@@ -1,0 +1,14 @@
+---
+- include: includes/obtain_session_token.yaml
+- hosts: localhost
+  tasks:
+    - shell: "{{ playbook_dir }}/test-data/load-test-data.py"
+      environment:
+        AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
+        AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"
+        AWS_SESSION_TOKEN: "{{ security_token }}"
+        AWS_DEFAULT_REGION: "{{ aws_region }}"
+        TRANSACTION_QUEUE_NAME: "{{ hostvars['transaction_signing_queue'].name }}"
+        PDF_BUCKET_NAME: "{{ hostvars['pdf_store_bucket'].name }}"
+        SIGNING_EVENTS_TOPIC_ARN: "{{ hostvars['signing_events_topic'].arn }}"
+        PYTHONUNBUFFERED: true

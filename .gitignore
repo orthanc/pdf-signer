@@ -6,6 +6,6 @@ ansible-user-provisioning/inventory/*
 ansible-user-provisioning/inventory/ansible-admin/host_vars/localhost/*
 
 keys/*
-s3-initial-data/*
+test-data/s3-initial-data/*
 
 *.swp

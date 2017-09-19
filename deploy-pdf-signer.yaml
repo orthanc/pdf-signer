@@ -34,6 +34,7 @@
           AWS_DEFAULT_REGION='{{ hostvars['transaction_signing_queue'].region }}'
           TRANSACTION_QUEUE_NAME='{{ hostvars['transaction_signing_queue'].name }}'
           PDF_BUCKET_NAME='{{ hostvars['pdf_store_bucket'].name }}'
+          SIGNING_EVENTS_TOPIC_ARN='{{ hostvars['signing_events_topic'].arn }}'
           PYTHONUNBUFFERED=true
           {{ ansible_user_dir }}/pdf-signer/queue-reader.py > log.txt 2>&1"
       notify: queue_reader_changed

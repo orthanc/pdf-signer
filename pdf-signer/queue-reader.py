@@ -12,9 +12,11 @@ pdf_updates = [
 
 sqs = boto3.resource('sqs')
 s3 = boto3.resource('s3')
+sns = boto3.resource('sns')
 
 transaction_queue = sqs.get_queue_by_name(QueueName=os.environ['TRANSACTION_QUEUE_NAME'])
 pdf_bucket = s3.Bucket(os.environ['PDF_BUCKET_NAME'])
+signing_events_topic = sns.Topic(os.environ['SIGNING_EVENTS_TOPIC_ARN'])
 
 while True:
   print "Getting Messages..."
@@ -62,5 +64,9 @@ while True:
         last_out = subprocess.Popen(cmd, stdin = last_out, stdout = subprocess.PIPE).stdout
 
       pdf_bucket.Object(result_key).upload_fileobj(last_out, {"ServerSideEncryption": "AES256"})
+      signing_events_topic.publish(
+        Subject='PDF Published',
+        Message=msg.body
+      )
 
     msg.delete()
