@@ -29,3 +29,4 @@ aws_type=sns_topic
 
 [aws_s3_bucket:vars]
 aws_type=s3_bucket
+s3_storage_class={{ default_s3_storage_class|default('STANDARD') }}

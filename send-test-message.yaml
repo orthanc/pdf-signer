@@ -10,5 +10,6 @@
         AWS_DEFAULT_REGION: "{{ aws_region }}"
         TRANSACTION_QUEUE_NAME: "{{ hostvars['transaction_signing_queue'].name }}"
         PDF_BUCKET_NAME: "{{ hostvars['pdf_store_bucket'].name }}"
+        PDF_BUCKET_STORAGE_CLASS: "{{ hostvars['pdf_store_bucket'].s3_storage_class }}"
         SIGNING_EVENTS_TOPIC_ARN: "{{ hostvars['signing_events_topic'].arn }}"
         PYTHONUNBUFFERED: true

@@ -16,6 +16,7 @@ sns = boto3.resource('sns')
 
 transaction_queue = sqs.get_queue_by_name(QueueName=os.environ['TRANSACTION_QUEUE_NAME'])
 pdf_bucket = s3.Bucket(os.environ['PDF_BUCKET_NAME'])
+pdf_storage_class = os.environ['PDF_BUCKET_STORAGE_CLASS']
 signing_events_topic = sns.Topic(os.environ['SIGNING_EVENTS_TOPIC_ARN'])
 
 while True:
@@ -63,7 +64,10 @@ while True:
       for cmd in update_commands:
         last_out = subprocess.Popen(cmd, stdin = last_out, stdout = subprocess.PIPE).stdout
 
-      pdf_bucket.Object(result_key).upload_fileobj(last_out, {"ServerSideEncryption": "AES256"})
+      pdf_bucket.Object(result_key).upload_fileobj(last_out, {
+          "ServerSideEncryption": "AES256",
+          "StorageClass": pdf_storage_class
+      })
       signing_events_topic.publish(
         Subject='PDF Published',
         Message=msg.body
