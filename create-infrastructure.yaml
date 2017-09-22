@@ -58,6 +58,7 @@
         name: "{{ name }}"
         state: present
         policy: "{{ lookup('template', 'templates/access_policy/sns_topic.json.j2') }}"
+        purge_subscriptions: False
         region: "{{ region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
