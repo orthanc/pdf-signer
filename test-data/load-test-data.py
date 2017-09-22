@@ -14,7 +14,7 @@ pdf_bucket.upload_file(script_dir + '/s3-initial-data/template.pdf', 'templates/
 sns = boto3.resource('sns')
 signing_events_topic = sns.Topic(os.environ['SIGNING_EVENTS_TOPIC_ARN'])
 subscribe_result = signing_events_topic.subscribe(
-    Protocol='email-json',
+    Protocol='email',
     Endpoint='email@example.com'
 )
 pprint.pprint(subscribe_result)
