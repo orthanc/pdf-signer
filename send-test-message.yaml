@@ -2,7 +2,7 @@
 - include: includes/obtain_session_token.yaml
 - hosts: localhost
   tasks:
-    - shell: "{{ playbook_dir }}/test-data/send-test-message.py"
+    - command: python "{{ playbook_dir }}/test-data/send-test-message.py"
       environment:
         AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
         AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"

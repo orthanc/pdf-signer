@@ -9,3 +9,4 @@
 /test-data/s3-initial-data/*
 
 *.swp
+/pyenv
