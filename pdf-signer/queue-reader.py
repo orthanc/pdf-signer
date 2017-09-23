@@ -10,14 +10,18 @@ pdf_updates = [
         {"key": "date", "x": 442, "y": 104, "page": 2}
     ]
 
-sqs = boto3.resource('sqs')
-s3 = boto3.resource('s3')
-sns = boto3.resource('sns')
 
-transaction_queue = sqs.get_queue_by_name(QueueName=os.environ['TRANSACTION_QUEUE_NAME'])
-pdf_bucket = s3.Bucket(os.environ['PDF_BUCKET_NAME'])
-pdf_storage_class = os.environ['PDF_BUCKET_STORAGE_CLASS']
-signing_events_topic = sns.Topic(os.environ['SIGNING_EVENTS_TOPIC_ARN'])
+transaction_queue_info = os.environ['TRANSACTION_QUEUE'].split(':', 1)
+pdf_bucket_info = os.environ['PDF_BUCKET'].split(':', 2)
+pdf_storage_class = pdf_bucket_info[2]
+signing_events_topic_info = os.environ['SIGNING_EVENTS_TOPIC'].split(':', 1)
+
+transaction_queue = boto3.session.Session(region_name=transaction_queue_info[0]) \
+    .resource('sqs').get_queue_by_name(QueueName=transaction_queue_info[1])
+pdf_bucket = boto3.session.Session(region_name=pdf_bucket_info[0]) \
+    .resource('s3').Bucket(pdf_bucket_info[1])
+signing_events_topic = boto3.session.Session(region_name=signing_events_topic_info[0]) \
+    .resource('sns').Topic(signing_events_topic_info[1])
 
 while True:
     print "Getting Messages..."

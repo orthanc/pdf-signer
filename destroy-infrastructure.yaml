@@ -63,7 +63,7 @@
         iam_type: user
         name: "{{ name }}"
         state: absent
-        region: "{{ aws_region }}"
+        region: "{{ aws_default_region }}"
         aws_access_key: "{{ iam_aws_access_key }}"
         aws_secret_key: "{{ iam_aws_secret_key }}"
         security_token: "{{ iam_security_token|default(omit) }}"
