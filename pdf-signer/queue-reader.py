@@ -1,5 +1,5 @@
 #! /usr/bin/python
-import boto3, iso8601, json, os, pprint, subprocess, sys, threading
+import boto3, iso8601, json, os, pprint, Queue, subprocess, sys, threading
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 cpdf_cmd = script_dir + '/cpdf-binaries-master/Linux-Intel-32bit/cpdf'
@@ -16,9 +16,34 @@ pdf_bucket_info = os.environ['PDF_BUCKET'].split(':', 2)
 pdf_storage_class = pdf_bucket_info[2]
 signing_events_topic_info = os.environ['SIGNING_EVENTS_TOPIC'].split(':', 1)
 
+def log_download(prog):
+    print "download " + str(prog)
+def log_upload(prog):
+    print "upload " + str(prog)
+
+def template_download(queue):
+    print "thread start"
+    pdf_bucket = boto3.session.Session(region_name=pdf_bucket_info[0]) \
+        .resource('s3').Bucket(pdf_bucket_info[1])
+
+    while True:
+        template_info = queue.get(True)
+        pprint.pprint(template_info)
+
+        dest_stream = template_info["dest"]
+        print "download start " + template_info["key"]
+        pdf_bucket.Object(template_info["key"]).download_fileobj(dest_stream, Callback=log_download)
+        dest_stream.close()
+        print "download done"
+
+template_download_queue = Queue.Queue()
+template_download_thread = threading.Thread(target=template_download, args=(template_download_queue,))
+template_download_thread.daemon = True
+template_download_thread.start()
+
 transaction_queue = boto3.session.Session(region_name=transaction_queue_info[0]) \
     .resource('sqs').get_queue_by_name(QueueName=transaction_queue_info[1])
-pdf_bucket_write = boto3.session.Session(region_name=pdf_bucket_info[0]) \
+pdf_bucket = boto3.session.Session(region_name=pdf_bucket_info[0]) \
     .resource('s3').Bucket(pdf_bucket_info[1])
 signing_events_topic = boto3.session.Session(region_name=signing_events_topic_info[0]) \
     .resource('sns').Topic(signing_events_topic_info[1])
@@ -55,30 +80,19 @@ while True:
                         '{:02d} {:02d}'.format(update['x'] + i['offset'], update['y']),
                         '-stdin', str(update['page']), '-stdout' ])
             #else:
-        
 
-        def log_download(prog):
-            print "download " + str(prog)
-        def log_upload(prog):
-            print "upload " + str(prog)
-        def template_download(dest_stream):
-            print "thread start"
-            pdf_bucket_read = boto3.session.Session(region_name=pdf_bucket_info[0]) \
-                .resource('s3').Bucket(pdf_bucket_info[1])
-            print "download start"
-            pdf_bucket_read.Object(template_key).download_fileobj(dest_stream, Callback=log_download)
-            dest_stream.close()
-            print "download done"
-            return
 
         first_process = subprocess.Popen(
-                update_commands[0],
-                stdin = subprocess.PIPE,
-                stdout = subprocess.PIPE,
-                stderr = sys.stderr
-            )
-        template_download_thread = threading.Thread(target=template_download, args=(first_process.stdin,))
-        template_download_thread.start()
+            update_commands[0],
+            stdin = subprocess.PIPE,
+            stdout = subprocess.PIPE,
+            stderr = sys.stderr
+        )
+
+        template_download_queue.put({
+            "key": template_key,
+            "dest": first_process.stdin
+        }, True, 5)
 
         print "create processes"
         last_out = first_process.stdout
@@ -92,13 +106,11 @@ while True:
         print "done create processes"
 
         print "upload start"
-        pdf_bucket_write.Object(result_key).upload_fileobj(last_out, {
+        pdf_bucket.Object(result_key).upload_fileobj(last_out, {
                 "ServerSideEncryption": "AES256",
                 "StorageClass": pdf_storage_class
         }, Callback=log_upload)
         print "upload done"
-        template_download_thread.join()
-        print "join done"
 
         signing_events_topic.publish(
             Subject='PDF Published',
