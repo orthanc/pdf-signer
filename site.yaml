@@ -1,5 +1,5 @@
 ---
-- include: includes/obtain_session_token.yaml
-- include: create-inventory.yaml
-- include: create-infrastructure.yaml
-- include: deploy-pdf-signer.yaml
+- import_playbook: includes/obtain_session_token.yaml
+- import_playbook: create-inventory.yaml
+- import_playbook: create-infrastructure.yaml
+- import_playbook: deploy-pdf-signer.yaml

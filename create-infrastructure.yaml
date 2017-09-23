@@ -1,6 +1,6 @@
 ---
-- include: includes/obtain_session_token.yaml
-- include: includes/aws_creds_host_facts.yaml
+- import_playbook: includes/obtain_session_token.yaml
+- import_playbook: includes/aws_creds_host_facts.yaml
 
 - hosts: aws_iam_user
   vars_files:
