@@ -6,7 +6,7 @@ aws_logical_inventory:
     transaction_signing_queue:
       access:
         - user: docsigner_user
-          mode: read
+          mode: dequeue
   sns_topics:
     signing_events_topic:
       access:

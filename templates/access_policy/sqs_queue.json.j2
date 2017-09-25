@@ -19,7 +19,7 @@
       "Principal": {
         "AWS": "{{ hostvars[access.user].arn }}"
       },
-      "Action": {% if access.mode == 'read' %}[
+      "Action": {% if access.mode == 'dequeue' %}[
         "sqs:DeleteMessage",
         "sqs:GetQueueAttributes",
         "sqs:ReceiveMessage",
