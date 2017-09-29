@@ -20,6 +20,13 @@
       file:
         path: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}"
         state: directory
+    - name: "Determin Region"
+      set_fact:
+        new_region: "{{ aws_logical_inventory[ aws_type + 's' ][inventory_hostname].region|default(aws_default_region) }}"
+    - name: "Check Region Hasn't Changed"
+      assert:
+        that: region is not defined or region == new_region
+        msg: "Canot change region from {{ region|default('null') }} to {{ new_region }}"
     - name: "inventory/host_vars/service_name/aws_service_spec.yaml"
       template:
         src: "templates/inventory/host_vars/{{ aws_type }}_spec.yaml.j2"
