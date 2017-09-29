@@ -30,6 +30,8 @@
     - name: "Load User Creds"
       include_vars:
         file: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}/aws_user_creds.yaml"
+      no_log: True
+
 
 - hosts: aws_sqs_queue
   gather_facts: False
