@@ -8,6 +8,10 @@ env_prefix: PREFIX
 # such as S3 bucket names
 env_ulid: ULID
 
+# Whether or not to include "test" items from the inventory such as extra
+# users used to poke service. This is typically true for dev and false for
+# production like environments
+include_test_inventory: true
 
 # The region to default to when region is not explicitly specified for a service
 aws_default_region: SELECT_REGION

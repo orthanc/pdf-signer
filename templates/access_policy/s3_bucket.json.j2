@@ -25,7 +25,9 @@
           "s3:x-amz-server-side-encryption": "AES256"
         }
       }
-    }{% for access in aws_logical_inventory.s3_buckets[inventory_hostname].access %}{% for key, mode in access.key_patterns.iteritems() %},
+    }{% for access in aws_logical_inventory.s3_buckets[inventory_hostname].access %}
+    {% if access.user in hostvars %}
+    {% for key, mode in access.key_patterns.iteritems() %},
     {
       "Effect": "Allow",
       "Principal": {
@@ -40,6 +42,8 @@
 {% else %} "{{ mode }}",
 {% endif %}
       "Resource": "{{ arn }}/{{ key }}"
-    }{% endfor %}{% endfor %}
+    }{% endfor %}
+    {% endif %}
+    {% endfor %}
   ]
 }

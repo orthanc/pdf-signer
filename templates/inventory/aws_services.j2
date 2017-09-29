@@ -1,31 +1,31 @@
 [aws_iam_user]
-{% for name, item in aws_logical_inventory.iam_users.iteritems() %}
+{% for name, item in aws_logical_inventory.iam_users.iteritems() %}{% if include_test_inventory or not item.test|default(False) %}
 {{ name }}
-{% endfor %}
+{% endif %}{% endfor %}
 
 [aws_iam_user:vars]
 aws_type=iam_user
 
 [aws_sqs_queue]
-{% for name, item in aws_logical_inventory.sqs_queues.iteritems() %}
+{% for name, item in aws_logical_inventory.sqs_queues.iteritems() %}{% if include_test_inventory or not item.test|default(False) %}
 {{ name }}
-{% endfor %}
+{% endif %}{% endfor %}
 
 [aws_sqs_queue:vars]
 aws_type=sqs_queue
 
 [aws_sns_topic]
-{% for name, item in aws_logical_inventory.sns_topics.iteritems() %}
+{% for name, item in aws_logical_inventory.sns_topics.iteritems() %}{% if include_test_inventory or not item.test|default(False) %}
 {{ name }}
-{% endfor %}
+{% endif %}{% endfor %}
 
 [aws_sns_topic:vars]
 aws_type=sns_topic
 
 [aws_s3_bucket]
-{% for name, item in aws_logical_inventory.s3_buckets.iteritems() %}
+{% for name, item in aws_logical_inventory.s3_buckets.iteritems() %}{% if include_test_inventory or not item.test|default(False) %}
 {{ name }}
-{% endfor %}
+{% endif %}{% endfor %}
 
 [aws_s3_bucket:vars]
 aws_type=s3_bucket

@@ -2,11 +2,15 @@
 aws_logical_inventory:
   iam_users:
     docsigner_user:
+    test_user:
+      test: True
   sqs_queues:
     transaction_signing_queue:
       access:
         - user: docsigner_user
           mode: dequeue
+        - user: test_user
+          mode: enqueue
   sns_topics:
     signing_events_topic:
       access:
@@ -19,3 +23,6 @@ aws_logical_inventory:
           key_patterns:
             "templates/*": read
             "results/*": write
+        - user: test_user
+          key_patterns:
+            "*": read_write
