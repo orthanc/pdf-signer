@@ -1,6 +1,5 @@
 ---
-- import_playbook: includes/obtain_session_token.yaml
-- import_playbook: includes/aws_creds_host_facts.yaml
+- import_playbook: obtain_session_token.yaml
 
 - hosts: pdf_signer
   tasks:
@@ -64,9 +63,9 @@
         name: "{{ name }}"
         state: absent
         region: "{{ aws_default_region }}"
-        aws_access_key: "{{ iam_aws_access_key }}"
-        aws_secret_key: "{{ iam_aws_secret_key }}"
-        security_token: "{{ iam_security_token|default(omit) }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        security_token: "{{ security_token }}"
     - name: "inventory/host_vars/aws_user/aws_user_creds.yaml"
       file:
         path: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}/aws_user_creds.yaml"

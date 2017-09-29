@@ -2,17 +2,17 @@
 # The prefix to add to all aws resources created for this environment
 # typical values are dev / test / prod or similar
 env_prefix: PREFIX
+
 # A ULID that identifys this environment uniquely. This is used to
 # ensure a unique name for resources that must be globally unique
 # such as S3 bucket names
 env_ulid: ULID
 
 aws_region: SELECT_REGION
-# The AWS authentication details used when deploying and destroying infrastructure.
-# Rather than setting these inline, add a vault.yaml file defining the vault_*
-# keys and protect this with ansible-vault to prevent loss of these keys
-aws_access_key: "{{ vault_aws_access_key }}"
-aws_secret_key: "{{ vault_aws_secret_key }}"
+
+# The vault file containing the static aws access keys used to obtain a STS
+# token using Multi-Factor Authentication
+static_aws_key_vault: "{{ playbook_dir }}/vaults/{{ env_prefix }}-aws_creds.yaml"
 
 gather_facts: false
 ansible_connection: local

@@ -1,4 +1,4 @@
 ---
-- import_playbook: includes/obtain_session_token.yaml
+- import_playbook: obtain_session_token.yaml
 - import_playbook: destroy-infrastructure.yaml
 - import_playbook: destroy-inventory.yaml

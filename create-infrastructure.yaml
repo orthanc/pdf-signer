@@ -1,6 +1,5 @@
 ---
-- import_playbook: includes/obtain_session_token.yaml
-- import_playbook: includes/aws_creds_host_facts.yaml
+- import_playbook: obtain_session_token.yaml
 
 - hosts: aws_iam_user
   vars_files:
@@ -13,9 +12,9 @@
         access_key_state: create
         state: present
         region: "{{ aws_default_region }}"
-        aws_access_key: "{{ iam_aws_access_key }}"
-        aws_secret_key: "{{ iam_aws_secret_key }}"
-        security_token: "{{ iam_security_token|default(omit) }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        security_token: "{{ security_token }}"
       no_log: True
       register: user_info
     - name: "Check if AWS Creds Changed"

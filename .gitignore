@@ -8,5 +8,8 @@
 /keys/*
 /test-data/s3-initial-data/*
 
+/vaults/*
+!vaults/template_aws_creds.yaml
+
 *.swp
 /pyenv

@@ -1,5 +1,5 @@
 ---
-- import_playbook: includes/obtain_session_token.yaml
+- import_playbook: obtain_session_token.yaml
 - hosts: localhost
   tasks:
     - command: python "{{ playbook_dir }}/test-data/load-test-data.py"
