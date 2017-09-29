@@ -1,5 +1,6 @@
 ---
 - hosts: aws_service
+  gather_facts: False
   vars_files:
     - infrastructure.yaml
   tasks:
@@ -9,6 +10,7 @@
         state: absent
 
 - hosts: localhost
+  gather_facts: False
   vars_files:
     - infrastructure.yaml
   tasks:

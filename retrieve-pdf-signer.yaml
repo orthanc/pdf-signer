@@ -1,5 +1,6 @@
 ---
 - hosts: pdf_signer
+  gather_facts: False
   tasks:
     - name: "Copy pdf-signer"
       synchronize:

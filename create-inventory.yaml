@@ -1,5 +1,6 @@
 ---
 - hosts: localhost
+  gather_facts: False
   vars_files:
     - infrastructure.yaml
   tasks:
@@ -11,6 +12,7 @@
       meta: refresh_inventory
 
 - hosts: aws_service
+  gather_facts: False
   vars_files:
     - infrastructure.yaml
   tasks:

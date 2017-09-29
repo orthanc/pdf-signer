@@ -16,7 +16,6 @@ aws_default_region: SELECT_REGION
 # token using Multi-Factor Authentication
 static_aws_key_vault: "{{ playbook_dir }}/vaults/{{ env_prefix }}-aws_creds.yaml"
 
-gather_facts: false
 # The S3 storage class to use when uploading to S3. This is primarily to allow for
 # REDUCED_REDUNDANCY for a minor cost saving in dev or other envs where data loss
 # is not actually an issue

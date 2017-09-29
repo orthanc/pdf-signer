@@ -2,6 +2,7 @@
 - import_playbook: obtain_session_token.yaml
 
 - hosts: aws_iam_user
+  gather_facts: False
   vars_files:
     - infrastructure.yaml
   tasks:
@@ -31,6 +32,7 @@
         file: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}/aws_user_creds.yaml"
 
 - hosts: aws_sqs_queue
+  gather_facts: False
   vars_files:
     - infrastructure.yaml
   tasks:
@@ -49,6 +51,7 @@
       delay: 10
 
 - hosts: aws_sns_topic
+  gather_facts: False
   vars_files:
     - infrastructure.yaml
   tasks:
@@ -65,6 +68,7 @@
       register: topic_info
 
 - hosts: aws_s3_bucket
+  gather_facts: False
   vars_files:
     - infrastructure.yaml
   tasks:

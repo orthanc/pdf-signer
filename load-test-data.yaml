@@ -1,6 +1,7 @@
 ---
 - import_playbook: obtain_session_token.yaml
 - hosts: localhost
+  gather_facts: False
   tasks:
     - command: python "{{ playbook_dir }}/test-data/load-test-data.py"
       environment:
