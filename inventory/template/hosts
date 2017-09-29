@@ -6,9 +6,23 @@ example-server
 [aws_control]
 localhost
 
-# Puting aws services into the aws_control group gives them access to the aws credentials
-[aws_control:children]
+[aws_iam_user]
+
+[aws_s3_bucket]
+
+[aws_sns_topic]
+
+[aws_sqs_queue]
+
+# aws_service group represents all services without needing to know the type
+[aws_service]
+
+[aws_service:children]
 aws_iam_user
 aws_s3_bucket
 aws_sns_topic
 aws_sqs_queue
+
+# Puting aws services into the aws_control group gives them access to the aws credentials
+[aws_control:children]
+aws_service
