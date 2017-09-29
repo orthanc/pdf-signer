@@ -65,7 +65,7 @@ signing_events_topic = boto3.session.Session(
 
 while True:
     print "Getting Messages..."
-    messages = transaction_queue.receive_messages(WaitTimeSeconds=20, MaxNumberOfMessages=10)
+    messages = transaction_queue.receive_messages(WaitTimeSeconds=20, MaxNumberOfMessages=5)
     if len(messages):
         print "No Messages"
     for msg in messages:
