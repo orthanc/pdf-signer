@@ -1,5 +1,5 @@
 #! /usr/bin/python
-import boto3, iso8601, json, os, pprint, Queue, subprocess, sys, threading
+import boto3, ConfigParser, iso8601, json, os, pprint, Queue, subprocess, sys, threading
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 cpdf_cmd = script_dir + '/cpdf-binaries-master/Linux-Intel-32bit/cpdf'
@@ -10,11 +10,18 @@ pdf_updates = [
         {"key": "date", "x": 442, "y": 104, "page": 2}
     ]
 
+aws_config = ConfigParser.ConfigParser()
+aws_config.read(sys.argv[1])
 
-transaction_queue_info = os.environ['TRANSACTION_QUEUE'].split(':', 1)
-pdf_bucket_info = os.environ['PDF_BUCKET'].split(':', 2)
+aws_creds = {
+    'aws_access_key_id': aws_config.get('DEFAULT', 'aws_access_key'),
+    'aws_secret_access_key': aws_config.get('DEFAULT', 'aws_secret_key'),
+}
+
+transaction_queue_info = aws_config.get('DEFAULT', 'transaction_queue').split(':', 1)
+pdf_bucket_info = aws_config.get('DEFAULT', 'pdf_bucket').split(':', 2)
 pdf_storage_class = pdf_bucket_info[2]
-signing_events_topic_info = os.environ['SIGNING_EVENTS_TOPIC'].split(':', 1)
+signing_events_topic_info = aws_config.get('DEFAULT', 'signing_events_topic').split(':', 1)
 
 def log_download(prog):
     print "download " + str(prog)
@@ -23,8 +30,10 @@ def log_upload(prog):
 
 def template_download(queue):
     print "thread start"
-    pdf_bucket = boto3.session.Session(region_name=pdf_bucket_info[0]) \
-        .resource('s3').Bucket(pdf_bucket_info[1])
+    pdf_bucket = boto3.session.Session(
+        region_name=pdf_bucket_info[0],
+        **aws_creds
+    ) .resource('s3').Bucket(pdf_bucket_info[1])
 
     while True:
         template_info = queue.get(True)
@@ -41,12 +50,18 @@ template_download_thread = threading.Thread(target=template_download, args=(temp
 template_download_thread.daemon = True
 template_download_thread.start()
 
-transaction_queue = boto3.session.Session(region_name=transaction_queue_info[0]) \
-    .resource('sqs').get_queue_by_name(QueueName=transaction_queue_info[1])
-pdf_bucket = boto3.session.Session(region_name=pdf_bucket_info[0]) \
-    .resource('s3').Bucket(pdf_bucket_info[1])
-signing_events_topic = boto3.session.Session(region_name=signing_events_topic_info[0]) \
-    .resource('sns').Topic(signing_events_topic_info[1])
+transaction_queue = boto3.session.Session(
+        region_name=transaction_queue_info[0],
+        **aws_creds
+    ).resource('sqs').get_queue_by_name(QueueName=transaction_queue_info[1])
+pdf_bucket = boto3.session.Session(
+        region_name=pdf_bucket_info[0],
+        **aws_creds
+    ).resource('s3').Bucket(pdf_bucket_info[1])
+signing_events_topic = boto3.session.Session(
+        region_name=signing_events_topic_info[0],
+        **aws_creds
+    ).resource('sns').Topic(signing_events_topic_info[1])
 
 while True:
     print "Getting Messages..."
