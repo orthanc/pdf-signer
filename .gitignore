@@ -11,5 +11,7 @@
 /vaults/*
 !vaults/template_aws_creds.yaml
 
+/test-data/creds
+
 *.swp
 /pyenv

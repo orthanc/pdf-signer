@@ -20,16 +20,14 @@
     }{% for access in aws_logical_inventory.sns_topics[inventory_hostname].access %}
     {% if access.user in hostvars %},
     {
+      "Sid": "access-{{ loop.index }}",
       "Effect": "Allow",
       "Principal": {
         "AWS": "{{ hostvars[access.user].arn }}"
       },
       "Action": {% if access.mode == 'send' %}"sns:Publish"
-{% elif mode == 'receive' %}[
-        "sns:Subscribe",
-        "sns:Receive"
-      ]
-{% else %} "{{ access.mode }}"
+{% elif access.mode == 'subscribe' %}"sns:Subscribe"
+{% else %}"{{ access.mode }}"
 {% endif %},
       "Resource": "{{ arn }}"
     }{% endif %}{% endfor %}

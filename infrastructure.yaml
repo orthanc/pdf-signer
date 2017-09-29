@@ -16,6 +16,8 @@ aws_logical_inventory:
       access:
         - user: docsigner_user
           mode: send
+        - user: test_user
+          mode: subscribe
   s3_buckets:
     pdf_store_bucket:
       access:
