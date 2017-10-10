@@ -6,6 +6,19 @@
   roles:
     - iam_user
 
+- hosts: pdf_store_bucket
+  gather_facts: False
+  roles:
+    - role: s3_bucket
+      iam_access:
+        - user: docsigner_user
+          key_patterns:
+            "templates/*": read
+            "results/*": write
+        - user: test_user
+          key_patterns:
+            "*": read_write
+
 - hosts: transaction_signing_queue
   gather_facts: False
   roles:
@@ -25,19 +38,6 @@
           mode: send
         - user: test_user
           mode: subscribe
-
-- hosts: pdf_store_bucket
-  gather_facts: False
-  roles:
-    - role: s3_bucket
-      iam_access:
-        - user: docsigner_user
-          key_patterns:
-            "templates/*": read
-            "results/*": write
-        - user: test_user
-          key_patterns:
-            "*": read_write
 
 - hosts: test_users
   gather_facts: False

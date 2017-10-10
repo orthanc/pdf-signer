@@ -1,3 +1,4 @@
 ---
 - import_playbook: obtain_session_token.yaml
+- import_playbook: deactivate-pdf-signer.yaml
 - import_playbook: destroy-infrastructure.yaml

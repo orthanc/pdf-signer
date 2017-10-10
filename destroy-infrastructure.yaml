@@ -1,24 +1,23 @@
 ---
 - import_playbook: obtain_session_token.yaml
 
-- hosts: pdf_signer
-  gather_facts: False
-  tasks:
-    - name: "Deactivate Queue Reader Cron"
-      cron:
-        name: queue-reader.py
-        state: absent
-    - name: "Stop Queue Reader"
-      command: pkill queue-reader.py
-      register: result
-      failed_when: false
-      changed_when: "result.rc == 0"
-
 - hosts: aws_sns_topic
   gather_facts: False
   tasks:
     - name: "sns_topic"
       sns_topic:
+        name: "{{ name }}"
+        state: absent
+        region: "{{ region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        security_token: "{{ security_token }}"
+
+- hosts: aws_sqs_queue
+  gather_facts: False
+  tasks:
+    - name: "sqs_queue"
+      sqs_queue:
         name: "{{ name }}"
         state: absent
         region: "{{ region }}"
@@ -34,18 +33,6 @@
         name: "{{ name }}"
         state: absent
         force: true
-        region: "{{ region }}"
-        aws_access_key: "{{ aws_access_key }}"
-        aws_secret_key: "{{ aws_secret_key }}"
-        security_token: "{{ security_token }}"
-
-- hosts: aws_sqs_queue
-  gather_facts: False
-  tasks:
-    - name: "sqs_queue"
-      sqs_queue:
-        name: "{{ name }}"
-        state: absent
         region: "{{ region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
