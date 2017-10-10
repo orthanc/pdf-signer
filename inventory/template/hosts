@@ -2,9 +2,14 @@
 [pdf_signer]
 example-server
 
+[test_users]
+test_user
+
 [aws_iam_user]
 docsigner_user
-test_user
+
+[aws_iam_user:children]
+test_users
 
 [aws_s3_bucket]
 pdf_store_bucket

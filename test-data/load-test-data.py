@@ -1,7 +1,10 @@
 #! /usr/bin/python
-import boto3, ConfigParser, iso8601, json, os, pprint, sys
+import boto3, ConfigParser, os, yaml, sys
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
+
+with open(script_dir + '/test_data.yaml') as stream:
+    test_data = yaml.load(stream)
 
 aws_config = ConfigParser.ConfigParser()
 aws_config.read(script_dir + '/creds/' + sys.argv[1] + '/test_user-aws_services.ini')
@@ -25,18 +28,16 @@ signing_events_topic = boto3.session.Session(
     ).resource('sns').Topic(signing_events_topic_info[1])
 
 
-pdf_bucket.upload_file(script_dir + '/s3-initial-data/template.pdf', 'templates/template.pdf', {
-        "ServerSideEncryption": "AES256",
-        "StorageClass": pdf_storage_class
-    })
-pdf_bucket.upload_file(script_dir + '/s3-initial-data/template.txt', 'templates/template.txt', {
+for template in test_data['templates'].itervalues():
+    print("Uploading: template/" + template['template_pdf'])
+    pdf_bucket.upload_file(script_dir + '/s3-initial-data/' + template['template_pdf'], 'templates/' + template['template_pdf'], {
         "ServerSideEncryption": "AES256",
         "StorageClass": pdf_storage_class
     })
 
-
-subscribe_result = signing_events_topic.subscribe(
-    Protocol='email',
-    Endpoint='email@example.com'
-)
-pprint.pprint(subscribe_result)
+for subscriber in test_data['sns_subscribers']:
+    print("Subscribing: " + subscriber)
+    subscribe_result = signing_events_topic.subscribe(
+        Protocol='email',
+        Endpoint=subscriber
+    )

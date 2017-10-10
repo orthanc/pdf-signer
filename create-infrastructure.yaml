@@ -39,7 +39,7 @@
           key_patterns:
             "*": read_write
 
-- hosts: aws_iam_user:&test_infrastructure
+- hosts: test_users
   gather_facts: False
   roles:
     - role: aws_services_ini

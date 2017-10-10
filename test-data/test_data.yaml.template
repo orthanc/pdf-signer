@@ -1,0 +1,10 @@
+---
+templates:
+  test1:
+    result_key_template: "{:04d}-{:02d}-{:02d}-result1.pdf"
+    template_pdf: "template1.pdf"
+  test2:
+    result_key_template: "{:04d}-{:02d}-{:02d}-result2.pdf"
+    template_pdf: "template2.pdf"
+sns_subscribers:
+  - example@example.com
