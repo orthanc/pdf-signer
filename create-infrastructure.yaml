@@ -21,6 +21,10 @@
     - name: "Check if AWS Creds Changed"
       set_fact:
         aws_creds_changed: "{{ user_info.changed and user_info.user_meta is defined }}"
+    - name: "inventory/host_vars/aws_user"
+      file:
+        state: directory
+        path: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}"
     - name: "inventory/host_vars/aws_user/aws_user_creds.yaml"
       template:
         src: templates/inventory/host_vars/aws_user_creds.yaml.j2

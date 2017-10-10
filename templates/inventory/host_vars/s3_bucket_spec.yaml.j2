@@ -1,7 +1,0 @@
----
-{% set name = env_prefix|lower + '-' + inventory_hostname|replace('_', '-')|lower + '-' + env_ulid|lower %}
-{% set storage_class = aws_logical_inventory.s3_buckets[inventory_hostname].storage_class|default(default_s3_storage_class|default('STANDARD')) %}
-name: "{{ name }}"
-region: "{{ new_region }}"
-arn: "arn:aws:s3:::{{ name }}"
-s3_storage_class: {{ storage_class }}

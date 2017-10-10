@@ -1,5 +1,0 @@
----
-{% set name = env_prefix|lower + '-' + inventory_hostname|replace('_', '-')|lower %}
-name: "{{ name }}"
-region: "{{ new_region }}"
-arn: "arn:aws:sqs:{{ new_region }}:{{ aws_account }}:{{ name }}"

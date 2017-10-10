@@ -2,17 +2,21 @@
 [pdf_signer]
 example-server
 
-# Puting localhost into the aws_control group gives it access to the aws credentials
-[aws_control]
-localhost
-
 [aws_iam_user]
+docsigner_user
+test_user
 
 [aws_s3_bucket]
+pdf_store_bucket
 
 [aws_sns_topic]
+signing_events_topic
 
 [aws_sqs_queue]
+transaction_signing_queue
+
+[test_infrastructure]
+test_user
 
 # aws_service group represents all services without needing to know the type
 [aws_service]
@@ -22,6 +26,10 @@ aws_iam_user
 aws_s3_bucket
 aws_sns_topic
 aws_sqs_queue
+
+# Puting localhost into the aws_control group gives it access to the aws credentials
+[aws_control]
+localhost
 
 # Puting aws services into the aws_control group gives them access to the aws credentials
 [aws_control:children]
