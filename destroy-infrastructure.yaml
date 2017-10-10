@@ -16,8 +16,6 @@
 
 - hosts: aws_sns_topic
   gather_facts: False
-  vars_files:
-    - infrastructure.yaml
   tasks:
     - name: "sns_topic"
       sns_topic:
@@ -30,8 +28,6 @@
 
 - hosts: aws_s3_bucket
   gather_facts: False
-  vars_files:
-    - infrastructure.yaml
   tasks:
     - name: "s3_bucket"
       s3_bucket:
@@ -45,8 +41,6 @@
 
 - hosts: aws_sqs_queue
   gather_facts: False
-  vars_files:
-    - infrastructure.yaml
   tasks:
     - name: "sqs_queue"
       sqs_queue:
@@ -59,8 +53,6 @@
 
 - hosts: aws_iam_user
   gather_facts: False
-  vars_files:
-    - infrastructure.yaml
   tasks:
     - name: "iam_user"
       iam:

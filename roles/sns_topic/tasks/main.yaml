@@ -1,0 +1,15 @@
+---
+- name: "SNS Topic"
+  sns_topic:
+    name: "{{ name }}"
+    state: present
+    policy: "{{ lookup('template', 'topic_policy.json.j2') }}"
+    purge_subscriptions: False
+    region: "{{ region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    security_token: "{{ security_token }}"
+  register: topic_info
+  until: not topic_info.failed|default(False)
+  retries: 3
+  delay: 20

@@ -1,0 +1,14 @@
+---
+- name: "S3 Bucket"
+  s3_bucket:
+    name: "{{ name }}"
+    state: present
+    policy: "{{ lookup('template', 'bucket_policy.json.j2') }}"
+    region: "{{ region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    security_token: "{{ security_token }}"
+  register: bucket_info
+  until: not bucket_info.failed|default(False)
+  retries: 3
+  delay: 20

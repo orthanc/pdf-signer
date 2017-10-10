@@ -1,0 +1,30 @@
+---
+- name: "IAM User"
+  iam:
+    iam_type: user
+    name: "{{ name }}"
+    access_key_state: create
+    state: present
+    region: "{{ aws_default_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    security_token: "{{ security_token }}"
+  no_log: True
+  register: user_info
+- name: "Check if AWS Creds Changed"
+  set_fact:
+    aws_creds_changed: "{{ user_info.changed and user_info.user_meta is defined }}"
+- name: "inventory/host_vars/aws_user"
+  file:
+    state: directory
+    path: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}"
+- name: "inventory/host_vars/aws_user/aws_user_creds.yaml"
+  template:
+    src: aws_user_creds.yaml.j2
+    dest: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}/aws_user_creds.yaml"
+  no_log: True
+  when: aws_creds_changed
+- name: "Load User Creds"
+  include_vars:
+    file: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}/aws_user_creds.yaml"
+  no_log: True

@@ -3,91 +3,41 @@
 
 - hosts: aws_iam_user
   gather_facts: False
-  vars_files:
-    - infrastructure.yaml
-  tasks:
-    - name: "IAM User"
-      iam:
-        iam_type: user
-        name: "{{ name }}"
-        access_key_state: create
-        state: present
-        region: "{{ aws_default_region }}"
-        aws_access_key: "{{ aws_access_key }}"
-        aws_secret_key: "{{ aws_secret_key }}"
-        security_token: "{{ security_token }}"
-      no_log: True
-      register: user_info
-    - name: "Check if AWS Creds Changed"
-      set_fact:
-        aws_creds_changed: "{{ user_info.changed and user_info.user_meta is defined }}"
-    - name: "inventory/host_vars/aws_user"
-      file:
-        state: directory
-        path: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}"
-    - name: "inventory/host_vars/aws_user/aws_user_creds.yaml"
-      template:
-        src: templates/inventory/host_vars/aws_user_creds.yaml.j2
-        dest: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}/aws_user_creds.yaml"
-      no_log: True
-      when: aws_creds_changed
-    - name: "Load User Creds"
-      include_vars:
-        file: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}/aws_user_creds.yaml"
-      no_log: True
+  roles:
+    - iam_user
 
-
-- hosts: aws_sqs_queue
+- hosts: transaction_signing_queue
   gather_facts: False
-  vars_files:
-    - infrastructure.yaml
-  tasks:
-    - name: "SQS Queue"
-      sqs_queue:
-        name: "{{ name }}"
-        state: present
-        policy: "{{ lookup('template', 'templates/access_policy/sqs_queue.json.j2') }}"
-        region: "{{ region }}"
-        aws_access_key: "{{ aws_access_key }}"
-        aws_secret_key: "{{ aws_secret_key }}"
-        security_token: "{{ security_token }}"
-      register: queue_info
-      until: not queue_info.failed|default(False)
-      retries: 5
-      delay: 10
+  roles:
+    - role: sqs_queue
+      iam_access:
+        - user: docsigner_user
+          mode: dequeue
+        - user: test_user
+          mode: enqueue
 
-- hosts: aws_sns_topic
+- hosts: signing_events_topic
   gather_facts: False
-  vars_files:
-    - infrastructure.yaml
-  tasks:
-    - name: "SNS Topic"
-      sns_topic:
-        name: "{{ name }}"
-        state: present
-        policy: "{{ lookup('template', 'templates/access_policy/sns_topic.json.j2') }}"
-        purge_subscriptions: False
-        region: "{{ region }}"
-        aws_access_key: "{{ aws_access_key }}"
-        aws_secret_key: "{{ aws_secret_key }}"
-        security_token: "{{ security_token }}"
-      register: topic_info
+  roles:
+    - role: sns_topic
+      iam_access:
+        - user: docsigner_user
+          mode: send
+        - user: test_user
+          mode: subscribe
 
-- hosts: aws_s3_bucket
+- hosts: pdf_store_bucket
   gather_facts: False
-  vars_files:
-    - infrastructure.yaml
-  tasks:
-    - name: "S3 Bucket"
-      s3_bucket:
-        name: "{{ name }}"
-        state: present
-        policy: "{{ lookup('template', 'templates/access_policy/s3_bucket.json.j2') }}"
-        region: "{{ region }}"
-        aws_access_key: "{{ aws_access_key }}"
-        aws_secret_key: "{{ aws_secret_key }}"
-        security_token: "{{ security_token }}"
-      register: bucket_info
+  roles:
+    - role: s3_bucket
+      iam_access:
+        - user: docsigner_user
+          key_patterns:
+            "templates/*": read
+            "results/*": write
+        - user: test_user
+          key_patterns:
+            "*": read_write
 
 - hosts: aws_iam_user:&test_infrastructure
   gather_facts: False

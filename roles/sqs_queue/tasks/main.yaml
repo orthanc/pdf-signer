@@ -1,0 +1,14 @@
+---
+- name: "SQS Queue"
+  sqs_queue:
+    name: "{{ name }}"
+    state: present
+    policy: "{{ lookup('template', 'queue_policy.json.j2') }}"
+    region: "{{ region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    security_token: "{{ security_token }}"
+  register: queue_info
+  until: not queue_info.failed|default(False)
+  retries: 3
+  delay: 20

@@ -13,7 +13,7 @@
           "aws:SecureTransport": "false"
         }
       }
-    }{% for access in aws_logical_inventory.sqs_queues[inventory_hostname].access %}
+    }{% for access in iam_access %}
     {% if access.user in hostvars %},
     {
       "Effect": "Allow",
