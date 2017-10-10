@@ -4,6 +4,6 @@
     path: "{{ dest_dir }}"
 - name: aws_services.ini
   template:
-    src: templates/aws_services.ini.j2
+    src: aws_services.ini.j2
     dest: "{{ dest_dir }}/{{ file_name|default('aws_services.ini') }}"
   no_log: True

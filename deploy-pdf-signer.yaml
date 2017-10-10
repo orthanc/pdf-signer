@@ -23,7 +23,8 @@
         use_ssh_args: true
       notify: queue_reader_changed
 
-    - include_tasks: includes/aws_services_ini.yaml
+    - import_role:
+        name: aws_services_ini
       vars:
         dest_dir: "{{ ansible_user_dir }}"
         iam_user: docsigner_user

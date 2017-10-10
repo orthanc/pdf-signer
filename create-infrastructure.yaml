@@ -41,15 +41,14 @@
 
 - hosts: aws_iam_user:&test_infrastructure
   gather_facts: False
-  tasks:
-    - include_tasks: includes/aws_services_ini.yaml
-      vars:
-        dest_dir: "{{ playbook_dir }}/test-data/creds/{{ inventory_dir|basename }}"
-        file_name: "{{ inventory_hostname }}-aws_services.ini"
-        iam_user: "{{ inventory_hostname }}"
-        queues:
-          transaction_queue: transaction_signing_queue
-        buckets:
-          pdf_bucket: pdf_store_bucket
-        topics:
-          signing_events_topic: signing_events_topic
+  roles:
+    - role: aws_services_ini
+      dest_dir: "{{ playbook_dir }}/test-data/creds/{{ inventory_dir|basename }}"
+      file_name: "{{ inventory_hostname }}-aws_services.ini"
+      iam_user: "{{ inventory_hostname }}"
+      queues:
+        transaction_queue: transaction_signing_queue
+      buckets:
+        pdf_bucket: pdf_store_bucket
+      topics:
+        signing_events_topic: signing_events_topic
