@@ -6,9 +6,9 @@
   tasks:
     - name: "sns_topic"
       sns_topic:
-        name: "{{ name }}"
+        name: "{{ aws_resource_name }}"
         state: absent
-        region: "{{ region }}"
+        region: "{{ aws_region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
         security_token: "{{ security_token }}"
@@ -18,9 +18,9 @@
   tasks:
     - name: "sqs_queue"
       sqs_queue:
-        name: "{{ name }}"
+        name: "{{ aws_resource_name }}"
         state: absent
-        region: "{{ region }}"
+        region: "{{ aws_region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
         security_token: "{{ security_token }}"
@@ -30,10 +30,10 @@
   tasks:
     - name: "s3_bucket"
       s3_bucket:
-        name: "{{ name }}"
+        name: "{{ aws_resource_name }}"
         state: absent
         force: true
-        region: "{{ region }}"
+        region: "{{ aws_region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
         security_token: "{{ security_token }}"
@@ -44,9 +44,9 @@
     - name: "iam_user"
       iam:
         iam_type: user
-        name: "{{ name }}"
+        name: "{{ aws_resource_name }}"
         state: absent
-        region: "{{ aws_default_region }}"
+        region: "{{ aws_region }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
         security_token: "{{ security_token }}"

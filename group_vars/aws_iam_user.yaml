@@ -1,0 +1,2 @@
+---
+resource_arn: "arn:aws:iam::{{ aws_account }}:user/{{ aws_resource_name }}"

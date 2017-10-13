@@ -2,11 +2,11 @@
 aws_access_key={{ hostvars[iam_user].user_aws_access_key }}
 aws_secret_key={{ hostvars[iam_user].user_aws_secret_key }}
 {% for var, queue in queues.iteritems() %}
-{{ var }}={{ hostvars[queue].region }}:{{ hostvars[queue].name }}
+{{ var }}={{ hostvars[queue].aws_region }}:{{ hostvars[queue].aws_resource_name }}
 {% endfor %}
 {% for var, bucket in buckets.iteritems() %}
-{{ var }}={{ hostvars[bucket].region }}:{{ hostvars[bucket].name }}:{{ hostvars[bucket].s3_storage_class }}
+{{ var }}={{ hostvars[bucket].aws_region }}:{{ hostvars[bucket].aws_resource_name }}:{{ hostvars[bucket].s3_storage_class }}
 {% endfor %}
 {% for var, topic in topics.iteritems() %}
-{{ var }}={{ hostvars[topic].region }}:{{ hostvars[topic].arn }}
+{{ var }}={{ hostvars[topic].aws_region }}:{{ hostvars[topic].resource_arn }}
 {% endfor %}

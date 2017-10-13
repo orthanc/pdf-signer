@@ -2,10 +2,10 @@
 - name: "IAM User"
   iam:
     iam_type: user
-    name: "{{ name }}"
+    name: "{{ aws_resource_name }}"
     access_key_state: create
     state: present
-    region: "{{ aws_default_region }}"
+    region: "{{ aws_region }}"
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
     security_token: "{{ security_token }}"

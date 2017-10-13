@@ -1,4 +1,0 @@
----
-name: "{{ env_prefix }}-{{ inventory_hostname }}"
-arn: "arn:aws:sns:{{ region }}:{{ aws_account }}:{{ name }}"
-region: "ap-southeast-2"

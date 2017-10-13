@@ -1,3 +1,0 @@
----
-arn: "arn:aws:iam::{{ aws_account }}:user/{{ name }}"
-name: "{{ env_prefix }}-{{ inventory_hostname }}"

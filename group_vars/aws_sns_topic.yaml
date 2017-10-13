@@ -1,0 +1,2 @@
+---
+resource_arn: "arn:aws:sns:{{ aws_region }}:{{ aws_account }}:{{ aws_resource_name }}"

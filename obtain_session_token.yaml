@@ -1,10 +1,10 @@
-- hosts: "aws_control:&{{ limit_hosts|default('all') }}"
+- hosts: "all:&{{ limit_hosts|default('all') }}"
   gather_facts: False
   tasks:
     - name: Check existing token age
       find:
         age: -1h
-        paths: "{{ inventory_dir }}/group_vars/aws_control"
+        paths: "{{ inventory_dir }}/group_vars/all"
         pattern: "aws_sts_token.yaml"
       run_once: True
       delegate_to: localhost
@@ -27,7 +27,7 @@
           run_once: True
         - sts_session_token:
             duration_seconds: 4500
-            region: "{{ aws_default_region }}"
+            region: "{{ aws_region }}"
             mfa_serial_number: "{{ mfa_token_arn }}"
             mfa_token: "{{ mfa_code }}"
             aws_access_key: "{{ static_aws_access_key }}"
@@ -39,17 +39,17 @@
         - name: aws_sts_token.yaml
           template:
             src: templates/aws_sts_token.yaml.j2
-            dest: "{{ inventory_dir }}/group_vars/aws_control/aws_sts_token.yaml"
+            dest: "{{ inventory_dir }}/group_vars/all/aws_sts_token.yaml"
             mode: 0600
           no_log: True
           run_once: True
         - name: "Load New STS Token Facts"
           include_vars:
-            file: "{{ inventory_dir }}/group_vars/aws_control/aws_sts_token.yaml"
+            file: "{{ inventory_dir }}/group_vars/all/aws_sts_token.yaml"
           no_log: True
       when: "not hostvars['localhost'].sts_token_file_info.files|length|bool"
     - name: "Load STS Token Facts"
       include_vars:
-        file: "{{ inventory_dir }}/group_vars/aws_control/aws_sts_token.yaml"
+        file: "{{ inventory_dir }}/group_vars/all/aws_sts_token.yaml"
       no_log: True
       when: "secure_token is not defined"

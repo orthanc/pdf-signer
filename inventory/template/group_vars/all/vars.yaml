@@ -1,4 +1,9 @@
 ---
+# The prefix for env scoped IAM policies. This should be equal to or a prefix of the
+# env_prefix variable below.
+# typical values are dev / test / prod or similar
+env_policy_prefix: PREFIX
+
 # The prefix to add to all aws resources created for this environment
 # typical values are dev / test / prod or similar
 env_prefix: PREFIX
@@ -9,11 +14,8 @@ env_prefix: PREFIX
 env_ulid: ULID
 
 # The region to default to when region is not explicitly specified for a service
-aws_default_region: SELECT_REGION
+aws_region: SELECT_REGION
 
 # The vault file containing the static aws access keys used to obtain a STS
 # token using Multi-Factor Authentication
 static_aws_key_vault: "{{ playbook_dir }}/vaults/{{ env_prefix }}-aws_creds.yaml"
-
-ansible_connection: local
-ansible_python_interpreter: python

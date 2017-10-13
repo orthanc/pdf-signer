@@ -1,10 +1,10 @@
 ---
 - name: "S3 Bucket"
   s3_bucket:
-    name: "{{ name }}"
+    name: "{{ aws_resource_name }}"
     state: present
     policy: "{{ lookup('template', 'bucket_policy.json.j2') }}"
-    region: "{{ region }}"
+    region: "{{ aws_region }}"
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
     security_token: "{{ security_token }}"

@@ -1,6 +1,6 @@
 {
   "Version": "2012-10-17",
-  "Id": "{{ name }}-policy",
+  "Id": "{{ aws_resource_name }}-policy",
   "Statement": [
     {
       "Sid": "DenyUnEncryptedTransport",
@@ -11,7 +11,7 @@
         "sns:Subscribe",
         "sns:Receive"
       ],
-      "Resource": "{{ arn }}",
+      "Resource": "{{ resource_arn }}",
       "Condition": {
         "BoolIfExists": {
           "aws:SecureTransport": "false"
@@ -23,13 +23,13 @@
       "Sid": "access-{{ loop.index }}",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "{{ hostvars[access.user].arn }}"
+        "AWS": "{{ hostvars[access.user].resource_arn }}"
       },
       "Action": {% if access.mode == 'send' %}"sns:Publish"
 {% elif access.mode == 'subscribe' %}"sns:Subscribe"
 {% else %}"{{ access.mode }}"
 {% endif %},
-      "Resource": "{{ arn }}"
+      "Resource": "{{ resource_arn }}"
     }{% endif %}{% endfor %}
   ]
 }

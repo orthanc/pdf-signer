@@ -1,13 +1,13 @@
 {
   "Version": "2012-10-17",
-  "Id": "{{ name }}-policy",
+  "Id": "{{ aws_resource_name }}-policy",
   "Statement": [
     {
       "Sid": "DenyUnEncryptedTransport",
       "Effect": "Deny",
       "Principal": "*",
       "Action": "sqs:*",
-      "Resource": "{{ arn }}",
+      "Resource": "{{ resource_arn }}",
       "Condition": {
         "BoolIfExists": {
           "aws:SecureTransport": "false"
@@ -18,7 +18,7 @@
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "{{ hostvars[access.user].arn }}"
+        "AWS": "{{ hostvars[access.user].resource_arn }}"
       },
       "Action": {% if access.mode == 'dequeue' %}[
         "sqs:DeleteMessage",
@@ -33,7 +33,7 @@
       ]
 {% else %} "{{ access.mode }}"
 {% endif %},
-      "Resource": "{{ arn }}"
+      "Resource": "{{ resource_arn }}"
     }{% endif %}{% endfor %}
   ]
 }

@@ -20,8 +20,6 @@ signing_events_topic
 [aws_sqs_queue]
 transaction_signing_queue
 
-[test_infrastructure]
-test_user
 
 # aws_service group represents all services without needing to know the type
 [aws_service]

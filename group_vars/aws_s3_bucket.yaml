@@ -1,0 +1,2 @@
+---
+resource_arn: "arn:aws:s3:::{{ aws_resource_name }}"
