@@ -20,12 +20,15 @@ signing_events_topic
 [aws_sqs_queue]
 transaction_signing_queue
 
+[aws_lambda]
+docsender_lambda
 
 # aws_service group represents all services without needing to know the type
 [aws_service]
 
 [aws_service:children]
 aws_iam_user
+aws_lambda
 aws_s3_bucket
 aws_sns_topic
 aws_sqs_queue

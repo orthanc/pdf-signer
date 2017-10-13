@@ -38,6 +38,27 @@
         aws_secret_key: "{{ aws_secret_key }}"
         security_token: "{{ security_token }}"
 
+- hosts: aws_lambda
+  gather_facts: False
+  tasks:
+    - name: Lambda
+      lambda:
+        name: "{{ aws_resource_name }}"
+        state: absent
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        security_token: "{{ security_token }}"
+
+    - name: Lambda Role
+      iam_role:
+        name: "{{ iam_actor_name }}"
+        state: absent
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        security_token: "{{ security_token }}"
+
 - hosts: aws_iam_user
   gather_facts: False
   tasks:

@@ -1,0 +1,33 @@
+---
+- name: Lambda Role
+  iam_role:
+    name: "{{ iam_actor_name }}"
+    state: present
+    assume_role_policy_document: "{{ lookup('template', 'assume_role.json.j2') }}"
+    managed_policy:
+      - "{{ env_policy_prefix }}-lambda-logs-write"
+    region: "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    security_token: "{{ security_token }}"
+  register: role_info
+  until: not role_info.failed|default(False)
+  retries: 3
+  delay: 20
+- name: Lambda
+  lambda:
+    name: "{{ aws_resource_name }}"
+    state: present
+    handler: "{{ handler }}"
+    runtime: "{{ runtime }}"
+    timeout: "{{ timeout|default(3) }}"
+    zip_file: "{{ zip_file|default(omit) }}"
+    role: "{{ role_info.iam_role.arn }}"
+    region: "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    security_token: "{{ security_token }}"
+  register: lambda_info
+  until: not lambda_info.failed|default(False)
+  retries: 3
+  delay: 20

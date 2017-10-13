@@ -6,6 +6,14 @@
   roles:
     - iam_user
 
+- hosts: docsender_lambda
+  gather_facts: False
+  roles:
+    - role: lambda
+      handler: "ocoen.docsender.handle_event"
+      runtime: "python3.6"
+      zip_file: "../docsender/dist/lambda-ocoen_docsender-0.1.0.zip"
+
 - hosts: pdf_store_bucket
   gather_facts: False
   roles:
@@ -38,6 +46,10 @@
           mode: send
         - user: test_user
           mode: subscribe
+      subscriptions:
+        - endpoint: "{{ hostvars['docsender_lambda'].resource_arn }}"
+          lambda_name: docsender_lambda
+          protocol: lambda
 
 - hosts: test_users
   gather_facts: False

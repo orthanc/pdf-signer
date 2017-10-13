@@ -4,7 +4,8 @@
     name: "{{ aws_resource_name }}"
     state: present
     policy: "{{ lookup('template', 'topic_policy.json.j2') }}"
-    purge_subscriptions: False
+    purge_subscriptions: True
+    subscriptions: "{{ subscriptions|default([]) }}"
     region: "{{ aws_region }}"
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
@@ -13,3 +14,17 @@
   until: not topic_info.failed|default(False)
   retries: 3
   delay: 20
+- name: Lambda Policy
+  lambda_policy:
+    statement_id: "sns-{{ aws_resource_name }}-invoke"
+    state: present
+    action: lambda:InvokeFunction
+    function_name: "{{ hostvars[item.lambda_name].aws_resource_name }}"
+    principal: "sns.amazonaws.com"
+    source_arn: "{{ resource_arn }}"
+    region: "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    security_token: "{{ security_token }}"
+  when: item.protocol == 'lambda'
+  with_items: "{{ subscriptions|default([]) }}"
