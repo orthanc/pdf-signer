@@ -13,6 +13,8 @@
       handler: "ocoen.docsender.handle_event"
       runtime: "python3.6"
       zip_file: "../docsender/dist/lambda-ocoen_docsender-0.1.0.zip"
+      environment_variables:
+        PDF_BUCKET: "{{ hostvars['pdf_store_bucket'].resource_locator }}"
 
 - hosts: pdf_store_bucket
   gather_facts: False
@@ -23,6 +25,9 @@
           key_patterns:
             "templates/*": read
             "results/*": write
+        - actor: docsender_lambda
+          key_patterns:
+            "results/*": read
         - actor: test_user
           key_patterns:
             "*": read_write

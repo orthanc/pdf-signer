@@ -23,6 +23,7 @@
     timeout: "{{ timeout|default(3) }}"
     zip_file: "{{ zip_file|default(omit) }}"
     role: "{{ role_info.iam_role.arn }}"
+    environment_variables: "{{ environment_variables }}"
     region: "{{ aws_region }}"
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
