@@ -18,12 +18,12 @@
         }
       }
     }{% for access in iam_access %}
-    {% if access.user in hostvars %},
+    {% if access.actor in hostvars %},
     {
       "Sid": "access-{{ loop.index }}",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "{{ hostvars[access.user].resource_arn }}"
+        "AWS": "{{ hostvars[access.actor].resource_arn }}"
       },
       "Action": {% if access.mode == 'send' %}"sns:Publish"
 {% elif access.mode == 'subscribe' %}"sns:Subscribe"

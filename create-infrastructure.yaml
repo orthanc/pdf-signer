@@ -19,11 +19,11 @@
   roles:
     - role: s3_bucket
       iam_access:
-        - user: docsigner_user
+        - actor: docsigner_user
           key_patterns:
             "templates/*": read
             "results/*": write
-        - user: test_user
+        - actor: test_user
           key_patterns:
             "*": read_write
 
@@ -32,9 +32,9 @@
   roles:
     - role: sqs_queue
       iam_access:
-        - user: docsigner_user
+        - actor: docsigner_user
           mode: dequeue
-        - user: test_user
+        - actor: test_user
           mode: enqueue
 
 - hosts: signing_events_topic
@@ -42,9 +42,9 @@
   roles:
     - role: sns_topic
       iam_access:
-        - user: docsigner_user
+        - actor: docsigner_user
           mode: send
-        - user: test_user
+        - actor: test_user
           mode: subscribe
       subscriptions:
         - endpoint: "{{ hostvars['docsender_lambda'].resource_arn }}"

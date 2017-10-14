@@ -1,2 +1,4 @@
 ---
 resource_arn: "arn:aws:iam::{{ aws_account }}:user/{{ aws_resource_name }}"
+iam_actor_arn: "{{ resource_arn }}"
+iam_actor_name: "{{ aws_resource_name }}"
