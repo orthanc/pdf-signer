@@ -1,0 +1,16 @@
+---
+email:
+  to: '"Display Name" <email@example.com>'
+  from: '"Display Name" <email@example.com>'
+  subject_template: "Subject of the mail goes here {{ event.date }}"
+  attachment_name_template: "{{ event.date }}-example.pdf"
+  body_html_template: |
+    <html>
+    <body>
+    <p>Hi,</p>
+
+    <p>This is an emali abut {{ attachment_name }}</p>
+    </body>
+    </html>
+result_key_template: "{ulid}-{date}.pdf"
+pdf_template: "template.pdf"

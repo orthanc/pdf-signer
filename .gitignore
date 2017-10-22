@@ -6,13 +6,15 @@
 /ansible-user-provisioning/inventory/ansible-admin/host_vars/localhost/*
 
 /keys/*
-/test-data/s3-initial-data/*
 
 /vaults/*
 !vaults/template_aws_creds.yaml
 
 /test-data/creds
 /test-data/test_data.yaml
+/test-data/profiles
+!/test-data/profiles/profile.yaml.template
+/test-data/templates
 
 *.swp
 /pyenv

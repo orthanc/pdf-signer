@@ -122,8 +122,9 @@ while True:
 
         print "upload start"
         pdf_bucket.Object(result_key).upload_fileobj(last_out, {
+                "ContentType": "application/pdf",
                 "ServerSideEncryption": "AES256",
-                "StorageClass": pdf_storage_class
+                "StorageClass": pdf_storage_class,
         }, Callback=log_upload)
         print "upload done"
 

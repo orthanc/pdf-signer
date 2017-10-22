@@ -16,6 +16,10 @@ env_ulid: ULID
 # The region to default to when region is not explicitly specified for a service
 aws_region: SELECT_REGION
 
+# The region to default to for SES access, since SES is only in 3 regions this
+# is commonly different from aws_retion
+aws_ses_region: SELECT_REGION
+
 # The vault file containing the static aws access keys used to obtain a STS
 # token using Multi-Factor Authentication
 static_aws_key_vault: "{{ playbook_dir }}/vaults/{{ env_prefix }}-aws_creds.yaml"

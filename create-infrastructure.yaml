@@ -10,11 +10,15 @@
   gather_facts: False
   roles:
     - role: lambda
-      handler: "ocoen.docsender.handle_event"
+      handler: "ocoen.docsenderlambda.handle_event"
       runtime: "python3.6"
       zip_file: "../docsender/dist/lambda-ocoen_docsender-0.1.0.zip"
+      timeout: 10
+      additional_policies: "{{ ses_send_policies }}"
       environment_variables:
-        PDF_BUCKET: "{{ hostvars['pdf_store_bucket'].resource_locator }}"
+        PROFILES_BUCKET: "{{ hostvars['pdf_store_bucket'].resource_locator }}"
+        RESULTS_BUCKET: "{{ hostvars['pdf_store_bucket'].resource_locator }}"
+        SES_REGION: "{{ aws_ses_region }}"
 
 - hosts: pdf_store_bucket
   gather_facts: False
@@ -28,6 +32,7 @@
         - actor: docsender_lambda
           key_patterns:
             "results/*": read
+            "profiles/*": read
         - actor: test_user
           key_patterns:
             "*": read_write

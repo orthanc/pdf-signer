@@ -4,8 +4,7 @@
     name: "{{ iam_actor_name }}"
     state: present
     assume_role_policy_document: "{{ lookup('template', 'assume_role.json.j2') }}"
-    managed_policy:
-      - "{{ env_policy_prefix }}-lambda-logs-write"
+    managed_policy: "{{ additional_policies|default([]) }} + ['{{ env_policy_prefix }}-lambda-logs-write']"
     region: "{{ aws_region }}"
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"

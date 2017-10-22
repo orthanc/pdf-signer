@@ -1,11 +1,12 @@
 #! /usr/bin/python
-import boto3, ConfigParser, iso8601, json, os, yaml, sys
+import boto3, ConfigParser, iso8601, json, os, yaml, sys, ulid
 from datetime import datetime
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
-with open(script_dir + '/test_data.yaml') as stream:
-    test_data = yaml.load(stream)
+profile_file_name = sys.argv[2] + '.yaml'
+with open(os.path.join(script_dir, 'profiles', profile_file_name)) as stream:
+    profile = yaml.load(stream)
 
 date = datetime.now()
 
@@ -24,12 +25,17 @@ transaction_queue = boto3.session.Session(
         **aws_creds
     ).resource('sqs').get_queue_by_name(QueueName=transaction_queue_info[1])
 
-template = test_data['templates'][sys.argv[2]]
+iso_date = '{:04d}-{:02d}-{:02d}'.format(date.year, date.month, date.day)
+format_values = {
+    'date': iso_date,
+    'ulid': ulid.ulid(),
+}
 transaction_queue.send_message(
     MessageBody=json.dumps({
         'amount': int(sys.argv[3]),
-        'date': '{:04d}-{:02d}-{:02d}'.format(date.year, date.month, date.day),
-        'template_key': 'templates/' + template['template_pdf'],
-        'result_key': 'results/' + template['result_key_template'].format(date.year, date.month, date.day),
+        'date': iso_date,
+        'profile_key': 'profiles/' + profile_file_name,
+        'template_key': 'templates/' + profile['pdf_template'],
+        'result_key': 'results/' + profile['result_key_template'].format(**format_values),
     })
 )
